@@ -28,7 +28,7 @@ llvmlite==0.15.0
 locket==0.2.0
 lxml==3.7.2
 matplotlib==2.0.0
-numpy==1.18.4
+numpy==1.11.3
 numpydoc==0.6.0
 pandas==0.19.2
 plotly==4.8.1
