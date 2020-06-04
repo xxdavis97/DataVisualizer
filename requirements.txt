@@ -36,7 +36,6 @@ PyTweening==1.0.3
 pytz==2016.10
 pywin32==220
 pywin32-ctypes==0.2.0
-PyYAML==3.12
 pyzmq==16.0.2
 rainbow==2.7.0
 PyYAML==5.3.1
