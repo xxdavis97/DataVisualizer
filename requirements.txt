@@ -1,6 +1,5 @@
 beautifulsoup4==4.5.3
 bs4==0.0.1
-Cython==0.25.2
 dash==1.12.0
 dash-core-components==1.10.0
 dash-html-components==1.0.3
@@ -60,7 +59,7 @@ rope-py3k==0.9.4.post1
 sh==1.12.13
 simplegeneric==0.8.1
 singledispatch==3.4.0.3
-six==1.15.0
+six==1.10.0
 snowballstemmer==1.2.1
 sockjs-tornado==1.0.3
 sortedcontainers==2.0.5
