@@ -23,8 +23,6 @@ numpy==1.11.3
 numpydoc==0.6.0
 oauthlib==2.0.7
 pandas==0.19.2
-pandas-datareader==0.3.0.post0
-path.py==0.0.0
 pickleshare==0.7.4
 plotly==4.8.1
 ply==3.9
