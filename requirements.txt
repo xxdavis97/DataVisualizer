@@ -6,7 +6,7 @@ dash-html-components==1.0.3
 dash-renderer==1.4.1
 dash-table==4.7.0
 fastcache==1.0.2
-Flask==1.1.2
+Flask==0.12.1
 Flask-Ask==0.9.3
 Flask-Compress==1.5.0
 Flask-Cors==3.0.2
@@ -48,7 +48,6 @@ pytest==3.0.5
 python-dateutil==2.6.0
 PyTweening==1.0.3
 pytz==2016.10
-PyYAML==3.12
 pyzmq==16.0.2
 requests==2.12.4
 requests-file==1.4.2
