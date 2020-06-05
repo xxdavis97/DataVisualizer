@@ -56,7 +56,7 @@ app.layout = html.Div(children= [
             html.Div(
                 className = "searchParameterContainer",
                 children= [
-                    html.Div(children="Symbol to graph: "),
+                    html.Div(children="Input ticker: "),
                     # Change default back to SPY
                     dcc.Input(id="Symbolinput",value="SNAP",type="text"),
                     # html.Button(id="newStock"),
