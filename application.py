@@ -450,5 +450,5 @@ def topMutual(ticker):
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
-if __name__ == "__main__":
-    app.run_server()
+# if __name__ == "__main__":
+#     app.run_server()
