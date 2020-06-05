@@ -14,14 +14,12 @@ jobs:
         python-version: '3.8.2'
 
     - name: Run pip
-        shell: bash
-        run: |
-          # If your web app project is not located in your repository's root
-          # Please change your directory for pip in pushd
-          pushd .
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt --target=".python_packages/lib/python3.8.2/site-packages"
-          popd
+      shell: bash
+      run: |
+        pushd .
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt --target=".python_packages/lib/python3.8.2/site-packages"
+        popd
 
     - name: Run Azure webapp deploy action using publish profile credentials
           uses: azure/webapps-deploy@v2
