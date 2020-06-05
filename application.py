@@ -13,6 +13,7 @@ import numpy as np
 import companyStatScraper
 
 app = dash.Dash(__name__)
+application = app.server
 
 
 # CSS Setup
@@ -450,5 +451,5 @@ def topMutual(ticker):
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
-# if __name__ == "__main__":
-#     app.run_server()
+if __name__ == '__main__':
+    application.run(debug=True, host='0.0.0.0', port='80')
