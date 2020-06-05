@@ -3,18 +3,18 @@ on: push
 
 jobs:
   build-and-deploy:
+    name: Build and deploy
     runs-on: ubuntu-latest
     steps:
     # checkout the repo
-    - name: 'Checkout GitHub Action'
-        uses: actions/checkout@master
+    - uses: actions/checkout@master
 
     - name: Setup Python 3.8.2
         uses: actions/setup-python@v1
         with:
           python-version: 3.8.2
 
-    - name: 'Run pip'
+    - name: Run pip
         shell: bash
         run: |
           # If your web app project is not located in your repository's root
@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt --target=".python_packages/lib/python3.8.2/site-packages"
           popd
 
-    - name: 'Run Azure webapp deploy action using publish profile credentials'
+    - name: Run Azure webapp deploy action using publish profile credentials
           uses: azure/webapps-deploy@v2
           with:
             app-name: jared-equity-visualization
