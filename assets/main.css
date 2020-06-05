@@ -515,4 +515,6 @@ html {
 
 .owner {
 	padding: 15px 15px;
+  max-height: 500px;
+  overflow-y: auto;
 }
