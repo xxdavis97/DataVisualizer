@@ -1,6 +1,6 @@
 import app as application
 
-app = application.app
+app = application.app.run_server
 
-if __name__ == "__main__":
-    app.run_server(debug=False)
+# if __name__ == "__main__":
+#     app.run_server(debug=False)
