@@ -3,6 +3,7 @@ import sys
 import time
 import requests
 import pandas as pd
+
 def get_cookie_value(r):
     return {'B': r.cookies['B']}
 
@@ -42,8 +43,9 @@ def get_now_epoch():
     return int(time.time())
 
 def download_quotes(symbol,start,end):
-    if start is None:
+    if start is None or start < 0:
         start = 0
+    if end is None:
         end = get_now_epoch()
     cookie, crumb = get_cookie_crumb(symbol)
     get_data(symbol, start, end, cookie, crumb)

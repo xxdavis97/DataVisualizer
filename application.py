@@ -1,7 +1,7 @@
 #################################
 # IMPORTS
 #################################
-from datetime import datetime
+from datetime import datetime, timedelta
 import dash
 import dash_table
 import dash_core_components as dcc
@@ -84,7 +84,6 @@ def serve_image(image_path):
     [State(component_id='url', component_property='href')]
 )
 def serveWebPage(pathname, href):
-    print(pathname, href)
     if pathname == "/" or pathname == "":
         return EQUITY_VISUALIZER_CONTENT
     elif pathname == "/about":
@@ -135,10 +134,12 @@ def update_value(input_data, start, end, bollinger, candle):
     global usePickle
     # subtract 200 days from collection but dont graph it
     # Webscrapes date and close price based on ticker data
+    origStart = start
     if usePickle:
         import pickle
         with open("./backupData/{0}/{0}-Company-Data".format(input_data), 'rb') as f:
             df = pickle.load(f)
+            graphicalData = df.copy()
             f.close()
     else:
         if start is None or end is None or start == "":
@@ -146,13 +147,18 @@ def update_value(input_data, start, end, bollinger, candle):
         else:
             # print((datetime.strptime(start,"%Y-%m-%d") - BDay(200)))
             # start = int(time.mktime((datetime.strptime(start,"%Y-%m-%d") - BDay(200)).timetuple()))
-            start = int(time.mktime((datetime.strptime(start, "%Y-%m-%d")).timetuple()))
+            start = int(time.mktime((datetime.strptime(start, "%Y-%m-%d") - timedelta(days=300)).timetuple()))
             if end == "":
                 end = int(time.mktime(datetime.strptime(datetime.strftime(datetime.today(),"%Y-%m-%d"),"%Y-%m-%d").timetuple()))
             else:
                 end = int(time.mktime(datetime.strptime(end,"%Y-%m-%d").timetuple()))
             download_quotes(input_data,start,end)
-        df = pd.read_csv(input_data+ ".csv")
+        df = pd.read_csv(input_data + ".csv")
+        if origStart is not None and origStart != "":
+            graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = df.copy()
+        # graphicalData.reset_index(inplace=True, drop=True)
         os.remove(input_data + ".csv")
     if toPickle:
         import pickle
@@ -168,9 +174,7 @@ def update_value(input_data, start, end, bollinger, candle):
     df.replace("null", np.nan, inplace=True)
     df.dropna(inplace=True)
     df.astype(float)
-    # print(df.index[0:199])
-    # df = df.iloc[200:]
-    # print(df)
+    graphicalData = df[df.index >= origStart]
     #Make first bar green
     color = ['rgb(0,255,0)']
     closeList = df.Close.values.tolist()
@@ -188,13 +192,13 @@ def update_value(input_data, start, end, bollinger, candle):
     }
     data = []
     volData = []
-    volData += [{'x': df.index, 'y': df.Volume,'type':'bar','marker':dict(color=color), 'name': "Volume"}]
+    volData += [{'x': graphicalData.index, 'y': graphicalData.Volume,'type':'bar','marker':dict(color=color), 'name': "Volume"}]
     if candle:
-        trace = go.Candlestick(x=df.index,
-                               open=df.Open,
-                               high=df.High,
-                               low=df.Low,
-                               close=df.Close,name=input_data)
+        trace = go.Candlestick(x=graphicalData.index,
+                               open=graphicalData.Open,
+                               high=graphicalData.High,
+                               low=graphicalData.Low,
+                               close=graphicalData.Close,name=input_data)
         layout = go.Layout(
             title=input_data,
             xaxis=dict(
@@ -205,7 +209,7 @@ def update_value(input_data, start, end, bollinger, candle):
         )
         data += [trace]
     else:
-        data += [{'x': df.index, 'y': df.Close, 'type': 'line', 'name': input_data}]
+        data += [{'x': graphicalData.index, 'y': graphicalData.Close, 'type': 'line', 'name': input_data}]
 
     if "check" in bollinger:
         # avg = meanCalc.rolling(window=20).mean()
@@ -222,27 +226,61 @@ def update_value(input_data, start, end, bollinger, candle):
             high += ['rgb(0,255,0)']
             middle+=['rgb(0,0,255)']
             low += ['rgb(255,0,0)']
-        data += [{'x' : df.index, 'y': df.Upper,'type':'line','marker':dict(color=high),'name':'Upper Bollinger Band'},
-                    {'x' : df.index, 'y': df.Middle,'type':'line','marker':dict(color=middle),'name':'Middle Bollinger Band'},
-                    {'x' : df.index, 'y': df.Lower,'type':'line','marker':dict(color=low),'name':'Lower Bollinger Band'}]
+        if origStart is not None and origStart != "":
+            graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = df.copy()
+        data += [{'x' : graphicalData.index, 'y': graphicalData.Upper,'type':'line','marker':dict(color=high),'name':'Upper Bollinger Band'},
+                    {'x' : graphicalData.index, 'y': graphicalData.Middle,'type':'line','marker':dict(color=middle),'name':'Middle Bollinger Band'},
+                    {'x' : graphicalData.index, 'y': graphicalData.Lower,'type':'line','marker':dict(color=low),'name':'Lower Bollinger Band'}]
     if "200SMA" in bollinger:
-        data += [{'x': df.index, 'y': df.rolling(window=200).mean()['Close'],'type':'line', 'name': '200 Day MA'}]
-        volData += [{'x': df.index, 'y': df.rolling(window=200).mean()['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '200 Day MA'}]
+        roll = df.rolling(window=200).mean()
+        if origStart is not None and origStart != "":
+            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = roll
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '200 Day MA'}]
+        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '200 Day MA'}]
     if "150SMA" in bollinger:
-        data += [{'x': df.index, 'y': df.rolling(window=150).mean()['Close'],'type':'line', 'name': '150 Day MA'}]
-        volData += [{'x': df.index, 'y': df.rolling(window=150).mean()['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '150 Day MA'}]
+        roll = df.rolling(window=150).mean()
+        if origStart is not None and origStart != "":
+            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = roll
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '150 Day MA'}]
+        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '150 Day MA'}]
     if "100SMA" in bollinger:
-        data += [{'x': df.index, 'y': df.rolling(window=100).mean()['Close'],'type':'line', 'name': '100 Day MA'}]
-        volData += [{'x': df.index, 'y': df.rolling(window=100).mean()['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '100 Day MA'}]
+        roll = df.rolling(window=100).mean()
+        if origStart is not None and origStart != "":
+            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = roll
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '100 Day MA'}]
+        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '100 Day MA'}]
     if "50SMA" in bollinger:
-        data += [{'x': df.index, 'y': df.rolling(window=50).mean()['Close'],'type':'line', 'name': '50 Day MA'}]
-        volData += [{'x': df.index, 'y': df.rolling(window=50).mean()['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '50 Day MA'}]
+        roll = df.rolling(window=50).mean()
+        if origStart is not None and origStart != "":
+            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = roll
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '50 Day MA'}]
+        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '50 Day MA'}]
     if "50EWMA" in bollinger:
-        data += [{'x': df.index, 'y': pd.ewma(df, span=50, min_periods=50)['Close'],'type':'line', 'name': '50 Day EWMA'}]
-        volData += [{'x': df.index, 'y': pd.ewma(df, span=50, min_periods=50)['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '50 Day EWMA'}]
+        roll = df.ewm(span=50, min_periods=50).mean()
+        if origStart is not None and origStart != "":
+            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = roll
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '50 Day EWMA'}]
+        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '50 Day EWMA'}]
     if "20EWMA" in bollinger:
-        data += [{'x': df.index, 'y': pd.ewma(df, span=20, min_periods=20)['Close'],'type':'line', 'name': '20 Day EWMA'}]
-        volData += [{'x': df.index, 'y': pd.ewma(df, span=20, min_periods=20)['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '20 Day EWMA'}]
+        roll = df.ewm(span=20, min_periods=20).mean()
+        if origStart is not None and origStart != "":
+            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = roll
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '20 Day EWMA'}]
+        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '20 Day EWMA'}]
     if '14SRSI' in bollinger:
         # https://stackoverflow.com/questions/20526414/relative-strength-index-in-python-pandas#29400434
         close = df['Close']
@@ -254,7 +292,12 @@ def update_value(input_data, start, end, bollinger, candle):
         roll_down2 = down.abs().rolling(14).mean()
         rs = roll_up2 / roll_down2
         rsi = 100.0 - (100.0 / (1.0 + rs))
-        data += [{'x': df.index, 'y': rsi, 'type': 'line', 'name': '14 Day RSI (SMA)'}]
+        df['14SRSI'] = rsi
+        if origStart is not None and origStart != "":
+            graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = df.copy()
+        data += [{'x': graphicalData.index, 'y': graphicalData['14SRSI'], 'type': 'line', 'name': '14 Day RSI (SMA)'}]
     if '14ERSI' in bollinger:
         close = df['Close']
         delta = close.diff()
@@ -266,7 +309,12 @@ def update_value(input_data, start, end, bollinger, candle):
         # Calculate the RSI based on EWMA
         rs = roll_up1 / roll_down1
         rsi = 100.0 - (100.0 / (1.0 + rs))
-        data += [{'x': df.index, 'y': rsi, 'type': 'line', 'name': '14 Day RSI (EWMA)'}]
+        df['14ERSI'] = rsi
+        if origStart is not None and origStart != "":
+            graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+        else:
+            graphicalData = df.copy()
+        data += [{'x': graphicalData.index, 'y': graphicalData['14ERSI'], 'type': 'line', 'name': '14 Day RSI (EWMA)'}]
     header = html.H2(input_data, className="graphHead title")
     return [header, dcc.Graph(
             id='example_graph',
