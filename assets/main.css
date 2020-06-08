@@ -574,7 +574,7 @@ a:hover {
   width: 60%;
 }
 
-h2 {
+.aboutHeader {
   border-bottom: 5px solid #3399ff;
   margin-top: 0px;
   margin-bottom: 10px;
@@ -603,4 +603,8 @@ h2 {
 
 h6 {
   font-weight: bold;
+}
+
+.contactList {
+  list-style-type: none;
 }

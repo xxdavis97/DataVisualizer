@@ -7,7 +7,7 @@ ABOUT_CONTENT = html.Div(children= [
         html.Div(id="selfie", className="six columns", children = [
             html.Img(src="/assets/me.png", className="myBioPic"),
             html.Div(className="about", children=[
-                html.H2("About"),
+                html.H2("About", className="aboutHeader"),
                 html.P("Jared graduated from Stevens Institute Of Technology in 2020 with a Bachelor of Science for Computer Science in"
                        "addition to double minoring in Quantitative Finance as well as Pure & Applied Mathematics.  After graduation "
                        "Jared started his career at Goldman Sachs where he is a Software Engineer for the Consumer and Investment "
@@ -17,7 +17,7 @@ ABOUT_CONTENT = html.Div(children= [
         ]),
         html.Div(id="skills", className="six columns", children = [
             html.Div(className="skills", children=[
-                html.H2("Core Skills And Abilities"),
+                html.H2("Core Skills And Abilities", className="aboutHeader"),
                 html.Ul(children=[
                     html.Li(
                         "Programming experience in Python, Java, JavaScript, SQL, C#, Git, Angular, Neo4j, HTML, CSS"),
@@ -36,7 +36,7 @@ ABOUT_CONTENT = html.Div(children= [
     ], className="row aboutRow1 aboutRow"),
     html.Br(),
     html.Div(className="row aboutRow", children=[
-        html.H2("Work Experience")
+        html.H2("Work Experience", className="aboutHeader")
     ]),
     html.Div(className="row aboutRow workRow", children=[
         html.Div(className="workInput", children = [
@@ -79,7 +79,7 @@ ABOUT_CONTENT = html.Div(children= [
             ])
         ]),
     ]),
-    html.Div(className="row aboutRow workRow", children=[
+    html.Div(className="row aboutRow", children=[
         html.Div(className="workInput", children=[
             html.H6("Brigade Capital Management - New York, NY"),
             html.Ul(children=[
@@ -92,6 +92,21 @@ ABOUT_CONTENT = html.Div(children= [
                 html.Li("Created automatic email alerts in SQL to notify traders of important price and metric movements in addition "
                         "to alerts showing daily, weekly, and monthly changes in a wide array of portfolio level risk statistics."),
                 html.Li("Generated plugins to make Python analyses user friendly in MS Excel.")
+            ])
+        ]),
+    ]),
+    html.Br(),
+    html.Div(className="row aboutRow", children=[
+            html.H2("Contact Information", className="aboutHeader")
+        ]),
+    html.Div(className="row aboutRow", children=[
+        html.Div(className="workInput contactList", children = [
+            html.Ul(children=[
+                html.Li(
+                    "Cell: (845) 667-9413"),
+                html.Li(
+                    "Email: jdavis4@stevens.edu"),
+                html.Li("Linkedin: https://www.linkedin.com/in/jared-d-bb0b5699/"),
             ])
         ]),
     ]),
