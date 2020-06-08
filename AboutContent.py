@@ -29,7 +29,7 @@ ABOUT_CONTENT = html.Div(children= [
                         "alerts of potential stock picks."),
                     html.Li(
                         "A second side project was the development of this website, which uses Python, notably Dash, Flask, Numpy, Pandas, "
-                        "Requests, and Beautiful Soup")
+                        "Requests, and Beautiful Soup.  Version control is covered by Github and deployment by Azure")
                 ])
             ])
         ]),
