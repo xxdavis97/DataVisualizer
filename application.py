@@ -1,9 +1,12 @@
-from datetime import datetime, timedelta
+#################################
+# IMPORTS
+#################################
+from datetime import datetime
 import dash
 import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from flask import send_from_directory
 import plotly.graph_objs as go
 from datareader import *
@@ -11,18 +14,40 @@ import os
 import pandas as pd
 import numpy as np
 import companyStatScraper
+from EquityVisualizerContent import EQUITY_VISUALIZER_CONTENT
+from AboutContent import ABOUT_CONTENT
 
+#################################
+# INIT DASH AND FLASK
+#################################
 app = dash.Dash(__name__)
 application = app.server
 
 
-# CSS Setup
-# app.css.append_css({
-#     'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css',
-# })
+#################################
+# CREATES APP LAYOUT - DATA GETS FILLED IN LATER
+#################################
+app.layout = html.Div(children= [
+    dcc.Location(id='url', refresh=False),
+    html.Div(className="banner", children=[
+        html.Img(id='bannerImg'),
+    ]),
+    html.Div(className="navBar", children=[
+        html.Ul(children=[
+            dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
+            # dcc.Link(html.Li("Temp"), href="#", className="borderLi"),
+            dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
+        ])
+    ]),
+    html.Div(id="content")
+])
+
+
+#################################
+# SERVE CSS STYLESHEET
+#################################
 css_directory = os.getcwd() + '/assets/'
 stylesheets = ['main.css']
-list_of_images = ['Header.png', 'banner.png']
 static_css_route = '/assets/'
 @app.server.route('{}<stylesheet>'.format(static_css_route))
 def serve_stylesheet(stylesheet):
@@ -36,6 +61,11 @@ def serve_stylesheet(stylesheet):
 for stylesheet in stylesheets:
     app.css.append_css({"external_url": "/assets/{}".format(stylesheet)})
 
+
+#################################
+# SERVE IMAGES
+#################################
+list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png']
 @app.server.route('{}<image_path>.png'.format(static_css_route))
 def serve_image(image_path):
     image_name = '{}.png'.format(image_path)
@@ -45,75 +75,55 @@ def serve_image(image_path):
 # app.index_string is how to modify the initial html
 
 
-# Creates the layout of an input field and an empty div that will hold the graph
-app.layout = html.Div(children= [
-    html.Div(className="banner", children = [
-        html.Img(src='/assets/banner.png'),
-    ]),
-    html.Div(
-        className="headerBox",
-        children=[
-            html.Div(
-                className = "searchParameterContainer",
-                children= [
-                    html.Div(children="Input ticker: "),
-                    # Change default back to SPY
-                    dcc.Input(id="Symbolinput",value="SNAP",type="text"),
-                    # html.Button(id="newStock"),
-                    dcc.Input(id="StartInput",value="",type="date"),
-                    dcc.Input(id="EndInput",value="",type="date"),
-                    dcc.RadioItems(
-                        className="candleToggle",
-                        options = [
-                            {'label': 'Price Plot', 'value': False},
-                            {'label': 'Candlestick Plot', 'value': True}],
-                        id = "candleToggle",
-                        value= False
-                    ),
-                    dcc.Dropdown(
-                        className= "optionDrop",
-                        options = [
-                            # {'label': 'Price', 'value': 'price'},
-                            {'label': 'Bollinger Bands', 'value': 'check'},
-                            # {'label': 'Candlestick', 'value': 'candle'},
-                            {'label': '200 Day SMA', 'value': '200SMA'},
-                            {'label': '150 Day SMA', 'value': '150SMA'},
-                            {'label': '100 Day SMA', 'value': '100SMA'},
-                            {'label': '50 Day SMA', 'value': '50SMA'},
-                            {'label': '50 Day EWMA', 'value': '50EWMA'},
-                            {'label': '20 Day EWMA', 'value': '20EWMA'},
-                            {'label': '14 Day RSI (SMA)', 'value': '14SRSI'},
-                            {'label': '14 Day RSI (EWMA)', 'value': '14ERSI'},
-                        ],
-                        id = 'bollinger',
-                        # value = ["price"],
-                        multi=True,
-                        searchable=False,
-                        placeholder="More options"
-                    )
-            ])
-    ]),
-    html.Div(id="output-graph"),
-    html.Div(id="twoGraphCol", children = [
-        html.Div(id="company-bio", className="six columns"),
-        html.Div(id="earnings-graph", className="six columns"),
+#################################
+# SERVE WEBPAGE CONTENT / ROUTING
+#################################
+@app.callback(
+    Output(component_id='content', component_property='children'),
+    [Input(component_id='url', component_property='pathname')],
+    [State(component_id='url', component_property='href')]
+)
+def serveWebPage(pathname, href):
+    print(pathname, href)
+    if pathname == "/" or pathname == "":
+        return EQUITY_VISUALIZER_CONTENT
+    elif pathname == "/about":
+        return ABOUT_CONTENT
+    else:
+        return ""
 
-    ], className="row"),
-    html.Div(id="earningsAndAbout", children = [
-        html.Div(id="ownership-pie", className="six columns"),
-        html.Div(id="shortTable", className="six columns"),
 
-    ], className="row"),
-    html.Div(id="fundOwnership", children=[
-        html.Div(id="top-institutional", className="six columns owner"),
-        html.Div(id="top-mutual", className="six columns owner"),
+#################################
+# SERVE CORRECT PAGE BANNER
+#################################
+@app.callback(
+    Output(component_id='bannerImg', component_property='src'),
+    [Input(component_id='url', component_property='pathname')]
+)
+def serveBanner(pathname):
+    if pathname is None or pathname == "/" or pathname == "":
+        return "/assets/bannerEquity.png"
+    elif pathname == "/about":
+        return "/assets/bannerAbout.png"
+    else:
+        return "/assets/banner404.png"
 
-    ], className="row"),
-])
 
+#################################
+# SAVE/USE PRE-COLLECTED DATA
+#################################
 toPickle = False
 usePickle = False
-# Our callback function that runs every time input field changes
+
+
+##################################################################
+# EQUITY VISUALIZATION CALLBACKS
+##################################################################
+
+
+#################################
+# GENERATE STOCK GRAPH
+#################################
 @app.callback(
     Output(component_id="output-graph",component_property="children"),
     [Input(component_id="Symbolinput",component_property="value"),Input(component_id="StartInput",component_property="value")
@@ -275,6 +285,9 @@ def update_value(input_data, start, end, bollinger, candle):
         ]
 
 
+#################################
+# GENERATE OWNERSHIP PIE CHART
+#################################
 @app.callback(
     Output(component_id="ownership-pie", component_property="children"),
     [Input(component_id="Symbolinput", component_property="value")]
@@ -302,6 +315,10 @@ def shareOwnershipChart(ticker):
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
+
+#################################
+# GENERATE SHORT SELLING DATA TABLE
+#################################
 @app.callback(
     Output(component_id="shortTable", component_property="children"),
     [Input(component_id="Symbolinput", component_property="value")]
@@ -337,6 +354,10 @@ def shortShareTable(ticker):
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
+
+#################################
+# GENERATE EARNINGS BAR CHART
+#################################
 @app.callback(
     Output(component_id="earnings-graph", component_property="children"),
     [Input(component_id="Symbolinput", component_property="value")]
@@ -364,6 +385,10 @@ def earningsChart(ticker):
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
+
+#################################
+# GENERATE COMPANY BIO
+#################################
 @app.callback(
     Output(component_id="company-bio", component_property="children"),
     [Input(component_id="Symbolinput", component_property="value")]
@@ -378,6 +403,9 @@ def companyBio(ticker):
         return ""
 
 
+#################################
+# GENERATE TOP INSTITUTIONAL OWNERSHIP TABLE
+#################################
 @app.callback(
     Output(component_id="top-institutional", component_property="children"),
     [Input(component_id="Symbolinput", component_property="value")]
@@ -415,6 +443,9 @@ def topInstitutional(ticker):
         return ""
 
 
+#################################
+# GENERATE TOP MUTUAL FUND OWNERSHIP TABLE
+#################################
 @app.callback(
     Output(component_id="top-mutual", component_property="children"),
     [Input(component_id="Symbolinput", component_property="value")]
@@ -451,8 +482,17 @@ def topMutual(ticker):
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
+
+##################################################################
+# ABOUT ME CALLBACKS
+##################################################################
+
+
+#################################
+# RUN APPLICATION
+#################################
 if __name__ == '__main__':
     # For deployment
-    application.run(debug=True, host='0.0.0.0', port='80')
+    # application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    # application.run(debug=False)
+    application.run(debug=False)

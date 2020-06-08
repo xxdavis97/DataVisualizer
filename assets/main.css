@@ -424,7 +424,7 @@ there.
 .headerBox {
     width: 100%;
     background-color: #3399ff;
-    padding: 10px
+    padding: 0px 10px 10px 10px;
 }
 
 .searchParameterContainer {
@@ -517,4 +517,90 @@ html {
 	padding: 15px 15px;
   max-height: 500px;
   overflow-y: auto;
+}
+
+.nav-bar {
+  height: 100px;
+  width: 100%;
+}
+
+a {
+  /*width: 33.2%;*/
+  width: 49.9%;
+  height: 100%;
+  padding: 10px 0px;
+  text-decoration: none;
+  background-color: #fff;
+  border-bottom: 1px solid black;
+}
+
+ul a {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  list-style-type: none;
+}
+
+ul, a {
+  margin: 0;
+}
+
+.borderLi {
+  border-right: 1px solid black;
+}
+
+a:hover {
+  background-color: #e6e6e6;
+}
+
+.myBioPic {
+  height: 300px;
+  border-radius: 20px;
+  /*margin-left: 10%;*/
+  margin-top: 1%;
+}
+
+.aboutRow1 {
+  margin-top: 20px;
+}
+
+#selfie {
+  display: inline-block;
+}
+
+.about { 
+  float: inline-end;
+  margin-right: 25px;
+  width: 60%;
+}
+
+h2 {
+  border-bottom: 5px solid #3399ff;
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+
+.skills {
+  margin-right: 10%;
+}
+
+.aboutRow {
+  margin-left: 6%;
+  margin-right: 6%;
+}
+
+.skills ul li, .workInput ul li {
+  list-style-type: square;
+}
+
+.workInput {
+  margin: 0% 5%;
+}
+
+.workRow {
+  border-bottom: 5px solid #3399ff;
+}
+
+h6 {
+  font-weight: bold;
 }
