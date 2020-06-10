@@ -447,6 +447,7 @@ def companyBio(ticker):
         header = html.H2("About {0}".format(ticker), className="graphHead snap")
         return [header, html.P(getData, className="bio")]
     except:
+        #testing 
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
