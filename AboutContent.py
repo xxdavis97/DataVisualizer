@@ -8,7 +8,7 @@ ABOUT_CONTENT = html.Div(children= [
             html.Img(src="/assets/me.png", className="myBioPic"),
             html.Div(className="about", children=[
                 html.H2("About", className="aboutHeader"),
-                html.P("Jared graduated from Stevens Institute Of Technology in 2020 with a Bachelor of Science for Computer Science in"
+                html.P("Jared graduated from Stevens Institute of Technology in 2020 with a Bachelor of Science for Computer Science in"
                        "addition to double minoring in Quantitative Finance as well as Pure & Applied Mathematics.  After graduation "
                        "Jared started his career at Goldman Sachs where he is a Software Engineer for the Consumer and Investment "
                        "Management Division.  Outside of work, Jared enjoys to work on coding side projects such as this website.  Some "
@@ -40,7 +40,12 @@ ABOUT_CONTENT = html.Div(children= [
     ]),
     html.Div(className="row aboutRow workRow", children=[
         html.Div(className="workInput", children = [
-            html.H6("Goldman Sachs - New York, NY"),
+            # html.H6("Goldman Sachs - New York, NY"),
+            html.H6("Goldman Sachs — Software Engineer"),
+            html.Div(className="aboutSubInfo", children= [
+                html.P("200 West St. New York, NY"),
+                html.P("May — August 2019, July 2020 — Present"),
+            ]),
             html.Ul(children=[
                 html.Li(
                     "From scratch created an application utilizing Angular, Java, and SQL to allow the business to gain streamlined"
@@ -55,7 +60,14 @@ ABOUT_CONTENT = html.Div(children= [
     ]),
     html.Div(className="row aboutRow workRow", children=[
         html.Div(className="workInput", children=[
-            html.H6("Virtual Facility - New York, NY"),
+            # html.H6("Virtual Facility - New York, NY"),
+            html.H6("Virtual Facility — Software Developer"),
+            html.Div(className="aboutSubInfo", children=[
+                html.P("39 West 37th St. New York, NY"),
+                html.P("May — December 2018"),
+            ]),
+            # html.P("39 West 37th St. New York, NY", className='companyAddress'),
+            # html.P("May-December 2018", className='datesWorked'),
             html.Ul(children=[
                 html.Li("Modified production level web applications using the Angular JavaScript framework, powered and optimized "
                         "by a Neo4j Graph Databaseto allow for significantly improved performance over large datasets."),
@@ -67,7 +79,15 @@ ABOUT_CONTENT = html.Div(children= [
     ]),
     html.Div(className="row aboutRow workRow", children=[
         html.Div(className="workInput", children=[
-            html.H6("Sphere Technology Solutions - Jersey City, NJ"),
+            #html.H6("Sphere Technology Solutions - Jersey City, NJ"),
+            html.H6("Sphere Technology Solutions — Software Developer"),
+            html.Div(className="aboutSubInfo", children=[
+                html.P("525 Washington Blvd. Jersey City, NJ"),
+                html.P("August — December 2017"),
+            ]),
+            # html.H6("Sphere Technology Solutions — Jersey City, NJ"),
+            # html.P("525 Washington Blvd. Jersey City, NJ", className='companyAddress'),
+            # html.P("August-December 2017", className='datesWorked'),
             html.Ul(children=[
                 html.Li("Played a major role as a full stack developer towards development and maintenance of Sphere’s leading "
                         "product, SphereBoard."),
@@ -81,7 +101,15 @@ ABOUT_CONTENT = html.Div(children= [
     ]),
     html.Div(className="row aboutRow", children=[
         html.Div(className="workInput", children=[
-            html.H6("Brigade Capital Management - New York, NY"),
+            # html.H6("Brigade Capital Management - New York, NY"),
+            html.H6("Brigade Capital Management — Software Developer"),
+            html.Div(className="aboutSubInfo", children=[
+                html.P("399 Park Ave. New York, NY"),
+                html.P("January — May 2017"),
+            ]),
+            # html.H6("Brigade Capital Management — New York, NY"),
+            # html.P("399 Park Ave. New York, NY", className='companyAddress'),
+            # html.P("January-May 2017", className='datesWorked'),
             html.Ul(children=[
                 html.Li("Developed scripts in python to manage and analyze large stores of investment data, including devising "
                         "a class to call any SQL query, procedure, or file directly from Python and store the result in a dataframe.  This "
