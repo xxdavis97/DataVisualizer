@@ -133,7 +133,6 @@ def getCompanyBio(ticker):
         #     # print(soup.findAll('p', {'class': 'description__text'}))
         #     return soup.find_all("section")[3].find("p").text
 
-    
 def getFundOwnership(ticker):
     global toPickle
     global usePickle
