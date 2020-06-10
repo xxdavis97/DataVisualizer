@@ -108,30 +108,32 @@ def getCompanyBio(ticker):
             return pick
     else:
         # Try means stock, except means ETF
-        try:
-            url = "https://finance.yahoo.com/quote/{0}/profile?p={0}".format(ticker)
-            site = re.get(url)
-            soup = BeautifulSoup(site.content)
-            if toPickle:
-                if not os.path.exists("backupData/{0}".format(ticker)):
-                    os.mkdir("backupData/{0}".format(ticker))
-                with open("./backupData/{0}/{0}-Company-Bio".format(ticker), 'wb') as f:
-                    pickle.dump(soup.find_all("section")[3].find("p").text, f)
-                    f.close()
-            return soup.find_all("section")[3].find("p").text
-        except:
-            url = "https://www.marketwatch.com/investing/fund/{0}".format(ticker)
-            site = re.get(url)
-            soup = BeautifulSoup(site.content)
-            if toPickle:
-                if not os.path.exists("backupData/{0}".format(ticker)):
-                    os.mkdir("backupData/{0}".format(ticker))
-                with open("./backupData/{0}/{0}-Company-Bio".format(ticker), 'wb') as f:
-                    pickle.dump(soup.find_all("section")[3].find("p").text, f)
-                    f.close()
-            # print(soup.prettify())
-            # print(soup.findAll('p', {'class': 'description__text'}))
-            return soup.find_all("section")[3].find("p").text
+        # try:
+        url = "https://finance.yahoo.com/quote/{0}/profile?p={0}".format(ticker)
+        site = re.get(url)
+        soup = BeautifulSoup(site.content)
+        if toPickle:
+            if not os.path.exists("backupData/{0}".format(ticker)):
+                os.mkdir("backupData/{0}".format(ticker))
+            with open("./backupData/{0}/{0}-Company-Bio".format(ticker), 'wb') as f:
+                pickle.dump(soup.find_all("section")[3].find("p").text, f)
+                f.close()
+        return soup.find_all("section")[3].find("p").text
+        # except:
+        #     url = "https://www.marketwatch.com/investing/fund/{0}".format(ticker)
+        #     site = re.get(url)
+        #     soup = BeautifulSoup(site.content)
+        #     if toPickle:
+        #         if not os.path.exists("backupData/{0}".format(ticker)):
+        #             os.mkdir("backupData/{0}".format(ticker))
+        #         with open("./backupData/{0}/{0}-Company-Bio".format(ticker), 'wb') as f:
+        #             pickle.dump(soup.find_all("section")[3].find("p").text, f)
+        #             f.close()
+        #     # print(soup.prettify())
+        #     # print(soup.findAll('p', {'class': 'description__text'}))
+        #     return soup.find_all("section")[3].find("p").text
+
+    
 def getFundOwnership(ticker):
     global toPickle
     global usePickle
