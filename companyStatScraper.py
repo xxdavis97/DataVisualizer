@@ -152,3 +152,31 @@ def getFundOwnership(ticker):
                 pickle.dump([instFrame, mutualFrame], f)
                 f.close()
         return [instFrame, mutualFrame]
+
+def getCurrMarketPrice(tickers):
+    prices = []
+    if tickers != []:
+        for ticker in tickers:
+            url = "https://finance.yahoo.com/quote/{0}?p={0}".format(ticker)
+            site = re.get(url)
+            soup = BeautifulSoup(site.content)
+            price = soup.find_all("span")[14].text
+            prices += [float(price)]
+    return prices
+
+def calcStockReturn(oldPrices, newPrices):
+    rets = []
+    if newPrices != []:
+        for i in range(len(oldPrices)):
+            rets += [((float(newPrices[i]) - float(oldPrices[i])) / float(oldPrices[i]))]
+    return rets
+
+def calcPortReturn(oldPrices, newPrices, amounts):
+    totalShares = sum(amounts)
+    rets = []
+    if newPrices != []:
+        for i in range(len(oldPrices)):
+            retOnAsset = ((float(newPrices[i]) - float(oldPrices[i])) / float(oldPrices[i]))
+            weightedRet = retOnAsset*(amounts[i]/totalShares)
+            rets += [weightedRet]
+    return [sum(rets)]
