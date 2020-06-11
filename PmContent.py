@@ -6,10 +6,6 @@ from dash_table.Format import Sign
 import pandas as pd
 from companyStatScraper import getCurrMarketPrice, calcStockReturn, calcPortReturn
 
-# TODO: Start it empty every time but eventually make it so it starts with data from mongo, unless new user
-# TODO: if new user then start it empty
-# TODO: Fuck db lets use cookies lol
-
 initDf = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
 initDf = initDf.reindex(sorted(initDf.columns, reverse=True), axis=1)
 
@@ -24,6 +20,17 @@ stockInfoInitDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": ma
 
 PM_CONTENT = html.Div(children= [
     dcc.Store(id='local', storage_type='local'),
+    html.Div(className="pmHowTo", children=[
+        html.Div(className="row aboutRow", children=[
+            html.H2("Portfolio Management Tool", className="aboutHeader"),
+            html.P("This app is designed to provide you with varying statistics based on the equities in your portfolio.  You may input the ticker "
+                   "of any stock or ETF that may be in your portfolio, you then input the number of shares you have in that position and then finally "
+                   "you must input the price per share at which the asset was purchased.  The app utilizes cookies to remember this information, so as long "
+                   "as cookies are enabled and the browser is not on private browsing, your information will be stored.  If you would rather this not happen, or "
+                   "prefer to keep cookies off or private browsing on, then the app will still work, you will just have to reinput your portfolio on every page "
+                   "refresh. ")
+        ])
+    ]),
     html.Div(className="tableWrapper row", children=[
         html.Div(id="positionInputTable", className="pmTable", children=[
             dash_table.DataTable(
