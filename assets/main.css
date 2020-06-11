@@ -525,8 +525,8 @@ html {
 }
 
 a {
-  /*width: 33.2%;*/
-  width: 49.9%;
+  width: 33.2%;
+  /*width: 49.9%;*/
   height: 100%;
   padding: 10px 0px;
   text-decoration: none;
@@ -626,4 +626,31 @@ h6 {
 
 .aboutSubInfo * {
   margin: 0;
+}
+
+.pmTable {
+  width: 33.33%;
+  margin: 0 auto;
+}
+
+.tableWrapper {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+#positionInputTable button {
+  margin-top: 10px;
+  float:right;
+  /*margin-left: 75%;*/
+}
+
+#btn-submit { 
+  background-color: #99ff99 !important;
+  border-color: #99ff99 !important;
+}
+
+#btn-reject {
+  background-color: #ff8566;
+  border-color: #ff8566;
 }

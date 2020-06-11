@@ -13,9 +13,10 @@ from datareader import *
 import os
 import pandas as pd
 import numpy as np
-import companyStatScraper
+from companyStatScraper import *
 from EquityVisualizerContent import EQUITY_VISUALIZER_CONTENT
 from AboutContent import ABOUT_CONTENT
+from PmContent import PM_CONTENT
 
 #################################
 # INIT DASH AND FLASK
@@ -35,7 +36,7 @@ app.layout = html.Div(children= [
     html.Div(className="navBar", children=[
         html.Ul(children=[
             dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
-            # dcc.Link(html.Li("Temp"), href="#", className="borderLi"),
+            dcc.Link(html.Li("Porfotlio Manager"), href="/pm", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
     ]),
@@ -65,7 +66,7 @@ for stylesheet in stylesheets:
 #################################
 # SERVE IMAGES
 #################################
-list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png']
+list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png']
 @app.server.route('{}<image_path>.png'.format(static_css_route))
 def serve_image(image_path):
     image_name = '{}.png'.format(image_path)
@@ -80,14 +81,15 @@ def serve_image(image_path):
 #################################
 @app.callback(
     Output(component_id='content', component_property='children'),
-    [Input(component_id='url', component_property='pathname')],
-    [State(component_id='url', component_property='href')]
+    [Input(component_id='url', component_property='pathname')]
 )
-def serveWebPage(pathname, href):
+def serveWebPage(pathname):
     if pathname == "/" or pathname == "":
         return EQUITY_VISUALIZER_CONTENT
     elif pathname == "/about":
         return ABOUT_CONTENT
+    elif pathname == "/pm":
+        return PM_CONTENT
     else:
         return ""
 
@@ -104,6 +106,8 @@ def serveBanner(pathname):
         return "/assets/bannerEquity.png"
     elif pathname == "/about":
         return "/assets/bannerAbout.png"
+    elif pathname == "/pm":
+        return "/assets/bannerPm.png"
     else:
         return "/assets/banner404.png"
 
@@ -536,11 +540,122 @@ def topMutual(ticker):
 ##################################################################
 
 
+
+##################################################################
+# PORTFOLIO MANAGEMENT CALLBACKS
+##################################################################
+
+
 #################################
+# ADD ROWS TO DATATABLE
+#################################
+testClicks = 0
+@app.callback(Output('posTable', 'data'),
+              [Input("local", 'modified_timestamp'), Input('addRowButton', 'n_clicks')],
+              [State('posTable', 'data'), State("local", "data")]
+)
+def addRowToPm(timestamp, n_clicks, posData, localData):
+    global testClicks
+    if len(posData) == 0:
+        df = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
+    elif posData[0]['Ticker'] == '' and posData[0]['No. Of Shares Held'] == '' and posData[0]['$ Initially Invested Per Share'] == '' and len(posData) == 1:
+        df = pd.read_json(localData, orient='split')
+        if df.empty:
+            df = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
+    else:
+        df = pd.DataFrame(posData)
+    if n_clicks is not None and n_clicks > 0:
+        testClicks += 1
+        if testClicks == n_clicks:
+            df = df.append({"Ticker": "", "No. Of Shares Held": "", "$ Initially Invested Per Share": ""}, ignore_index=True)
+        else:
+            testClicks -= 1
+    return df.to_dict('records')
+
+
+#################################
+# MODIFY ROW FROM STOCK TABLE ON INPUT TABLE DELETION OR ADDITION
+#################################
+@app.callback(Output('srTable', 'data'),
+              [Input('posTable', 'data')],
+              [State('srTable', 'data')]
+)
+def modifyStockRow(inputData, stockData):
+    inpDf = pd.DataFrame(inputData)
+    listData = inpDf.values.flatten()
+    # Differentiate between one stock with blank values and lots of stocks where only one has blank values
+    if len(listData) == 3 and '' in listData:
+        return []
+    if '' in listData:
+        return stockData
+    else:
+        sDf = pd.DataFrame(stockData)
+        inpTickers = inpDf['Ticker'].values.tolist()
+        if sDf.empty:
+            stockTickers = []
+        else:
+            stockTickers = sDf['Ticker'].values.tolist()
+        if len(inpTickers) > len(stockTickers):
+            if len(stockTickers) == 0:
+                toAdd = inpDf
+            else:
+                toAdd = inpDf[~inpDf['Ticker'].isin(sDf['Ticker'].values.tolist())]
+            tickerList = toAdd['Ticker'].values.tolist()
+            oldPrice = toAdd["$ Initially Invested Per Share"]
+            markPrice = getCurrMarketPrice(tickerList)
+            ret = calcStockReturn(oldPrice.values.tolist(), markPrice)
+            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "Return": ret})
+            if sDf.empty:
+                sDf = stockInfoDf
+            else:
+                sDf = sDf.append(stockInfoDf)
+        else:
+            oldPrice = inpDf["$ Initially Invested Per Share"]
+            markPrice = getCurrMarketPrice(inpTickers)
+            ret = calcStockReturn(oldPrice.values.tolist(), markPrice)
+            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "Return": ret})
+        return sDf.to_dict('records')
+
+
+#################################
+# FIX PORTFOLIO RETURN AFTER ADDED OR DELETED STOCK
+#################################
+@app.callback(Output('pmTable', 'data'),
+              [Input('srTable', 'data')],
+              [State('posTable', 'data'), State('pmTable', 'data')]
+)
+def fixPMReturn(stockData, inputData, portData):
+    inpDf = pd.DataFrame(inputData)
+    listData = inpDf.values.flatten()
+    if len(listData) == 3 and '' in listData:
+        return []
+    if '' in listData:
+        return portData
+    else:
+        sDf = pd.DataFrame(stockData)
+        newRet = calcPortReturn(inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(), sDf['Current Market Price'].astype(float).values.tolist(),
+                       inpDf['No. Of Shares Held'].astype(float).values.tolist())
+        newRetDf = pd.DataFrame({'Return': [newRet]})
+        return newRetDf.to_dict('records')
+
+
+#################################
+# STORE STOCK SELECTIONS SO YOU DONT HAVE TO INPUT IT EVERY TIME
+#################################
+@app.callback(
+    Output('local', 'data'),
+    [Input("posTable", "data")]
+)
+def storeSession(inputData):
+    df = pd.DataFrame(inputData)
+    return df.to_json(orient="split")
+
+
+##################################################################
 # RUN APPLICATION
-#################################
+##################################################################
 if __name__ == '__main__':
     # For deployment
-    application.run(debug=True, host='0.0.0.0', port='80')
+    # application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    # application.run(debug=False)
+    application.run(debug=False)
