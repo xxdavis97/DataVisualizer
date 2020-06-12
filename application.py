@@ -606,9 +606,10 @@ def modifyStockRow(inputData, stockData):
             oldPrice = toAdd["$ Initially Invested Per Share"]
             quantityHeld = toAdd['No. Of Shares Held'].values.tolist()
             markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
+            stockValue = toAdd['No. Of Shares Held'] * markPrice
             stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
-            percOfPort = (toAdd['No. Of Shares Held'] / toAdd['No. Of Shares Held'].sum()).values.tolist()
+            percOfPort = (stockValue / stockValue.sum()).values.tolist()
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
             stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
             if sDf.empty:
@@ -619,9 +620,10 @@ def modifyStockRow(inputData, stockData):
             oldPrice = inpDf["$ Initially Invested Per Share"]
             quantityHeld = inpDf['No. Of Shares Held'].values.tolist()
             markPrice, betas = companyStatScraper.getCurrMarketPrice(inpTickers)
+            stockValue = inpDf['No. Of Shares Held'] * markPrice
             stds, correlations = companyStatScraper.calcStdOfReturns(inpTickers)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
-            percOfPort = (inpDf['No. Of Shares Held'] / inpDf['No. Of Shares Held'].sum()).values.tolist()
+            percOfPort = (stockValue / stockValue.sum()).values.tolist()
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
             sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
         return sDf.to_dict('records')
@@ -644,8 +646,9 @@ def fixPMReturn(stockData, inputData, portData):
         return portData
     else:
         sDf = pd.DataFrame(stockData)
-        newRet, portBeta, weights = companyStatScraper.calcPortReturn(inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(), sDf['Current Market Price'].astype(float).values.tolist(),
-                       inpDf['No. Of Shares Held'].astype(float).values.tolist(), sDf['Beta'].astype(float).values.tolist())
+        weights = sDf['% Of Portfolio'].values.tolist()
+        newRet, portBeta = companyStatScraper.calcPortReturn(inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(), sDf['Current Market Price'].astype(float).values.tolist(),
+                       weights, sDf['Beta'].astype(float).values.tolist())
         portStd = companyStatScraper.getPortStd(sDf['Standard Deviation'], correlations, weights)
         sharpe = companyStatScraper.getSharpeRatio(newRet, portStd)
         treynor = companyStatScraper.getTreynorRatio(newRet, portBeta)
