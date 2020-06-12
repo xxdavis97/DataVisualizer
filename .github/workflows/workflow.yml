@@ -18,7 +18,7 @@ jobs:
       run: |
         pushd .
         python -m pip install --upgrade pip
-        pip install -numpy==1.18.0
+        pip install numpy==1.18.0
         pip install scipy==1.2.3
         pip install -r requirements.txt --target=".python_packages/lib/python3.8.2/site-packages"
         popd
