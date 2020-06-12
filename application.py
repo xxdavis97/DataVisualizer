@@ -376,35 +376,35 @@ def shareOwnershipChart(ticker):
     [Input(component_id="Symbolinput", component_property="value")]
 )
 def shortShareTable(ticker):
-    try:
-        getData = companyStatScraper.getShortShares(ticker)
-        dataDf = pd.DataFrame({"1": getData[0], "2": getData[1]})
-        header = html.H2("Short Position Information", className="graphHead")
-        table = dash_table.DataTable(
-            id='shortTableInner',
-            columns=[{"name": i, "id": i} for i in dataDf.columns],
-            data= dataDf.to_dict('records'),
-            style_header={
-                'display': 'none'
-            },
-            style_data_conditional=[
-                {
-                    'if': {'row_index': 'even'},
-                    'backgroundColor': '#3399ff'
-                }
-            ],
-            style_data={
-                'whiteSpace': 'normal',
-                'height': 'auto',
-                'lineHeight': '15px'
-            },
-            style_cell={'textAlign': 'center'},
-            css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
-        )
-        return [header,table]
-    except:
-        # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
-        return ""
+    # try:
+    getData = companyStatScraper.getShortShares(ticker)
+    dataDf = pd.DataFrame({"1": getData[0], "2": getData[1]})
+    header = html.H2("Short Position Information", className="graphHead")
+    table = dash_table.DataTable(
+        id='shortTableInner',
+        columns=[{"name": i, "id": i} for i in dataDf.columns],
+        data= dataDf.to_dict('records'),
+        style_header={
+            'display': 'none'
+        },
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'even'},
+                'backgroundColor': '#3399ff'
+            }
+        ],
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+            'lineHeight': '15px'
+        },
+        style_cell={'textAlign': 'center'},
+        css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
+    )
+    return [header,table]
+    # except:
+    #     # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
+    #     return ""
 
 
 #################################
@@ -496,6 +496,10 @@ def topInstitutional(ticker):
 
 
 #################################
+# DEPRECATED: YAHOO FINANCE REMOVED MUTUAL INFO... USE PICKLE TO SEE WHAT IT USED TO LOOK LIKE
+#################################
+'''
+#################################
 # GENERATE TOP MUTUAL FUND OWNERSHIP TABLE
 #################################
 @app.callback(
@@ -533,6 +537,7 @@ def topMutual(ticker):
     except:
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
+'''
 
 
 ##################################################################

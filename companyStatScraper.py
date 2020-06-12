@@ -140,21 +140,24 @@ def getFundOwnership(ticker):
             institutionalRows += [[name.text for name in row.find_all('td')]]
         institutionalRows = institutionalRows[1:]
 
-        mutual = soup.find_all('table')[2]
-        mutualRows = []
-        for row in mutual.find_all('tr'):
-            mutualRows += [[name.text for name in row.find_all('td')]]
-        mutualRows = mutualRows[1:]
+        # Yahoo finance got rid of Mutual fund data
+        # mutual = soup.find_all('table')[2]
+        # mutualRows = []
+        # for row in mutual.find_all('tr'):
+        #     mutualRows += [[name.text for name in row.find_all('td')]]
+        # mutualRows = mutualRows[1:]
 
         instFrame = pd.DataFrame(data = institutionalRows, columns = titles)
-        mutualFrame = pd.DataFrame(data = mutualRows, columns = titles)
+        # mutualFrame = pd.DataFrame(data = mutualRows, columns = titles)
         if toPickle:
             if not os.path.exists("backupData/{0}".format(ticker)):
                 os.mkdir("backupData/{0}".format(ticker))
             with open("./backupData/{0}/{0}-Fund-Ownership".format(ticker), 'wb') as f:
-                pickle.dump([instFrame, mutualFrame], f)
+                # pickle.dump([instFrame, mutualFrame], f)
+                pickle.dump([instFrame], f)
                 f.close()
-        return [instFrame, mutualFrame]
+        # return [instFrame, mutualFrame]
+        return [instFrame]
 
 def getCurrMarketPrice(tickers):
     prices = []
