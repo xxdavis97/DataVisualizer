@@ -128,6 +128,7 @@ PM_CONTENT = html.Div(children= [
             dash_table.DataTable(
                 id='pmTable',
                 columns=[{"id": "Portfolio Return", "name": "Portfolio Return", "type": "numeric", 'format': FormatTemplate.percentage(2).sign(Sign.positive)},
+                         {"id": "Portfolio PnL", "name": "Portfolio PnL", "type": "numeric"},
                          {"id": "Portfolio Beta", "name": "Portfolio Beta", "type": "numeric"},
                          {"id": "Portfolio Standard Deviation", "name": "Portfolio Standard Deviation", "type": "numeric", 'format': FormatTemplate.percentage(2)},
                          {"id": "Sharpe Ratio", "name": "Sharpe Ratio", "type": "numeric"},
@@ -160,6 +161,22 @@ PM_CONTENT = html.Div(children= [
                         'if': {
                             'filter_query': '{Portfolio Return} < 0',
                             'column_id': 'Portfolio Return'
+                        },
+                        'color': '#ff704d',
+                        'textWeight': 'bold'
+                    },
+                    {
+                        'if': {
+                            'filter_query': '{Portfolio PnL} > 0',
+                            'column_id': 'Portfolio PnL'
+                        },
+                        'color': '#33cc33',
+                        'textWeight': 'bold'
+                    },
+                    {
+                        'if': {
+                            'filter_query': '{Portfolio PnL} < 0',
+                            'column_id': 'Portfolio PnL'
                         },
                         'color': '#ff704d',
                         'textWeight': 'bold'

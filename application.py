@@ -652,8 +652,9 @@ def fixPMReturn(stockData, inputData, portData):
         portStd = companyStatScraper.getPortStd(sDf['Standard Deviation'], correlations, weights)
         sharpe = companyStatScraper.getSharpeRatio(newRet, portStd)
         treynor = companyStatScraper.getTreynorRatio(newRet, portBeta)
-        newRetDf = pd.DataFrame({'Portfolio Return': newRet, "Portfolio Beta": [round(portBeta[0], 2)], "Portfolio Standard Deviation": portStd,
-                                 "Sharpe Ratio": sharpe, 'Treynor Ratio': treynor})
+        newRetDf = pd.DataFrame({'Portfolio Return': newRet, 'Portfolio PnL': round(sDf['PnL'].sum(), 2),
+                                 'Portfolio Beta': [round(portBeta[0], 2)], 'Portfolio Standard Deviation': portStd, 'Sharpe Ratio': sharpe,
+                                 'Treynor Ratio': treynor})
         return newRetDf.to_dict('records')
 
 
