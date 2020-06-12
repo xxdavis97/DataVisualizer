@@ -589,7 +589,7 @@ a:hover {
   margin-right: 6%;
 }
 
-.skills ul li, .workInput ul li {
+.skills ul li, .workInput ul li, .aboutRow ul li {
   list-style-type: square;
 }
 
@@ -666,4 +666,8 @@ h6 {
 .pmTableStock {
   width: 50%;
   margin: 0 auto;
+}
+
+.tips {
+  margin-left: 4%;
 }

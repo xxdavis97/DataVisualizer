@@ -27,7 +27,15 @@ PM_CONTENT = html.Div(children= [
                    "you must input the price per share at which the asset was purchased.  The app utilizes cookies to remember this information, so as long "
                    "as cookies are enabled and the browser is not on private browsing, your information will be stored.  If you would rather this not happen, or "
                    "prefer to keep cookies off or private browsing on, then the app will still work, you will just have to reinput your portfolio on every page "
-                   "refresh. "),
+                   "refresh. Things to keep in mind: "),
+            html.Ul(className="tips", children=[
+                html.Li("When you make a change on the page happen (addition or deletion of a row), the tab on your browser will say \"Updating\", do not make"
+                        " any other changes until that goes away"),
+                html.Li("If you accidentally do make multiple changes before waiting for an update I recommend doing a page refresh, it will be much more efficient "
+                        "than letting the algorithm figure itself out"),
+                html.Li("Do not have blank cells or rows, the bottom two tables only update when the input table is full"),
+                html.Li("After you input a row, click onto a different cell within the table to trigger the event that updates the webpage")
+            ]),
             html.Strong("*Note* Generating the porftolio statistics table is extremely data intensive and involves a lot of computation, "
                         "if you add too many assets to your portfolio you may notice severe hangups in load time")
         ])
