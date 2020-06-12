@@ -662,3 +662,8 @@ h6 {
 #pmInfo {
   margin-bottom: 20px;
 }
+
+.pmTableStock {
+  width: 50%;
+  margin: 0 auto;
+}

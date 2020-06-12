@@ -608,20 +608,22 @@ def modifyStockRow(inputData, stockData):
             markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
             stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
+            percOfPort = (toAdd['No. Of Shares Held'] / toAdd['No. Of Shares Held'].sum()).values.tolist()
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
-            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
             if sDf.empty:
                 sDf = stockInfoDf
             else:
                 sDf = sDf.append(stockInfoDf)
         else:
             oldPrice = inpDf["$ Initially Invested Per Share"]
-            quantityHeld = inpDf['No. Of Shares Held']
+            quantityHeld = inpDf['No. Of Shares Held'].values.tolist()
             markPrice, betas = companyStatScraper.getCurrMarketPrice(inpTickers)
             stds, correlations = companyStatScraper.calcStdOfReturns(inpTickers)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
+            percOfPort = (inpDf['No. Of Shares Held'] / inpDf['No. Of Shares Held'].sum()).values.tolist()
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
-            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
         return sDf.to_dict('records')
 
 
