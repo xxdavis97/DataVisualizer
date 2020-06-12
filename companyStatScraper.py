@@ -234,9 +234,9 @@ def getPortStd(standDev, corrs, weights):
     return sum(list(set(corrsCalcs)))
 
 def getSharpeRatio(ret, std):
-    riskfree = getRiskFreeRate()
-    return round((float(ret[0]) - float(riskfree)) / float(std), 2)
+    riskfree = float(getRiskFreeRate()) / 100
+    return round((float(ret[0]) - riskfree) / float(std), 2)
 
 def getTreynorRatio(ret, beta):
-    riskfree = getRiskFreeRate()
-    return round((float(ret[0]) - float(riskfree)) / float(beta[0]), 2)
+    riskfree = float(getRiskFreeRate()) / 100
+    return round((float(ret[0]) - riskfree) / float(beta[0]), 2)
