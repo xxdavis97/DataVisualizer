@@ -177,6 +177,13 @@ def calcStockReturn(oldPrices, newPrices):
             rets += [((float(newPrices[i]) - float(oldPrices[i])) / float(oldPrices[i]))]
     return rets
 
+def calcPnL(oldPrices, newPrices, amounts):
+    pnl = []
+    if newPrices != []:
+        for i in range(len(oldPrices)):
+            pnl += [round((float(newPrices[i]*float(amounts[i])) - float(oldPrices[i]*float(amounts[i]))), 2)]
+    return pnl
+
 def calcPortReturn(oldPrices, newPrices, amounts, betas):
     totalShares = sum(amounts)
     rets = []

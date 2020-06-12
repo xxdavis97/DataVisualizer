@@ -604,20 +604,24 @@ def modifyStockRow(inputData, stockData):
                 toAdd = inpDf[~inpDf['Ticker'].isin(sDf['Ticker'].values.tolist())]
             tickerList = toAdd['Ticker'].values.tolist()
             oldPrice = toAdd["$ Initially Invested Per Share"]
+            quantityHeld = toAdd['No. Of Shares Held']
             markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
             stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
+            pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
-            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
             if sDf.empty:
                 sDf = stockInfoDf
             else:
                 sDf = sDf.append(stockInfoDf)
         else:
             oldPrice = inpDf["$ Initially Invested Per Share"]
+            quantityHeld = inpDf['No. Of Shares Held']
             markPrice, betas = companyStatScraper.getCurrMarketPrice(inpTickers)
             stds, correlations = companyStatScraper.calcStdOfReturns(inpTickers)
+            pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
-            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
         return sDf.to_dict('records')
 
 
