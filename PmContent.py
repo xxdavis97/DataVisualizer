@@ -4,19 +4,18 @@ import dash_table
 import dash_table.FormatTemplate as FormatTemplate
 from dash_table.Format import Sign
 import pandas as pd
-from companyStatScraper import getCurrMarketPrice, calcStockReturn, calcPortReturn
+from companyStatScraper import getCurrMarketPrice, calcStockReturn
 
 initDf = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
 initDf = initDf.reindex(sorted(initDf.columns, reverse=True), axis=1)
 
-# TODO: Implied Vol
 tickerList = initDf['Ticker'].values.tolist()
 if tickerList == ['']:
     tickerList = []
 oldPrice = initDf["$ Initially Invested Per Share"]
-markPrice = getCurrMarketPrice(tickerList)
+markPrice, betas = getCurrMarketPrice(tickerList)
 ret = calcStockReturn(oldPrice, markPrice)
-stockInfoInitDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "Return": ret})
+stockInfoInitDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "Return": ret, "Beta": betas})
 
 PM_CONTENT = html.Div(children= [
     dcc.Store(id='local', storage_type='local'),
@@ -47,6 +46,14 @@ PM_CONTENT = html.Div(children= [
                         'backgroundColor': '#b3d9ff'
                     }
                 ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
+                },
+                style_cell={'textAlign': 'center'},
+                css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'},
+                     {"selector": ".dash-header", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
                 data=initDf.to_dict('records'),
                 editable=True,
                 row_deletable=True,
@@ -60,10 +67,20 @@ PM_CONTENT = html.Div(children= [
                 id='srTable',
                 columns=[{"id": "Ticker", "name": "Ticker", "type": "text"},
                          {"id": "Current Market Price", "name": "Current Market Price", "type": "numeric"},
-                         {"id": "Return", "name": "Return","type": "numeric", 'format': FormatTemplate.percentage(2).sign(Sign.positive)}],
+                         {"id": "Return", "name": "Return","type": "numeric", 'format': FormatTemplate.percentage(2).sign(Sign.positive)},
+                         {"id": "Beta", "name": "Beta", "type": "numeric"},
+                         {"id": "Standard Deviation", "name": "Standard Deviation", "type": "numeric", 'format': FormatTemplate.percentage(2)}],
                 style_header={
                     'backgroundColor': '#3399ff'
                 },
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
+                },
+                style_cell={'textAlign': 'center'},
+                css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'},
+                     {"selector": ".dash-header", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
                 style_data_conditional=[
                     {
                         'if': {'row_index': 'odd'},
@@ -75,14 +92,25 @@ PM_CONTENT = html.Div(children= [
         ])
     ]),
     html.Div(id="pmInfo", className="tableWrapper row", children=[
-        html.Div(id="pmResultTable", className="pmTable", children=[
-            # TODO: Beta
+        html.Div(id="pmResultTable", className="aboutRow", children=[
             dash_table.DataTable(
                 id='pmTable',
-                columns=[{"id": "Return", "name": "Return", "type": "numeric", 'format': FormatTemplate.percentage(2).sign(Sign.positive)}],
+                columns=[{"id": "Portfolio Return", "name": "Portfolio Return", "type": "numeric", 'format': FormatTemplate.percentage(2).sign(Sign.positive)},
+                         {"id": "Portfolio Beta", "name": "Portfolio Beta", "type": "numeric"},
+                         {"id": "Portfolio Standard Deviation", "name": "Portfolio Standard Deviation", "type": "numeric", 'format': FormatTemplate.percentage(2)},
+                         {"id": "Sharpe Ratio", "name": "Sharpe Ratio", "type": "numeric"},
+                         {"id": "Treynor Ratio", "name": "Treynor Ratio", "type": "numeric"}],
                 style_header={
                     'backgroundColor': '#3399ff'
                 },
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
+                },
+                style_cell={'textAlign': 'center'},
+                css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'},
+                     {"selector": ".dash-header", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
                 style_data_conditional=[
                     {
                         'if': {'row_index': 'odd'},

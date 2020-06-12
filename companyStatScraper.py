@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import pickle
 import os
 import pandas as pd
+from datareader import download_quotes
+import time
+from datetime import datetime, timedelta
 
 # soup = None
 toPickle = False
@@ -155,14 +158,17 @@ def getFundOwnership(ticker):
 
 def getCurrMarketPrice(tickers):
     prices = []
+    betas = []
     if tickers != []:
         for ticker in tickers:
             url = "https://finance.yahoo.com/quote/{0}?p={0}".format(ticker)
             site = re.get(url)
             soup = BeautifulSoup(site.content)
             price = soup.find_all("span")[14].text
+            beta = soup.find_all('table')[1].find_all('tr')[1].find_all('span')[1].text
             prices += [float(price)]
-    return prices
+            betas += [float(beta)]
+    return prices, betas
 
 def calcStockReturn(oldPrices, newPrices):
     rets = []
@@ -171,12 +177,66 @@ def calcStockReturn(oldPrices, newPrices):
             rets += [((float(newPrices[i]) - float(oldPrices[i])) / float(oldPrices[i]))]
     return rets
 
-def calcPortReturn(oldPrices, newPrices, amounts):
+def calcPortReturn(oldPrices, newPrices, amounts, betas):
     totalShares = sum(amounts)
     rets = []
+    weightedBetas = []
+    weights = []
     if newPrices != []:
         for i in range(len(oldPrices)):
             retOnAsset = ((float(newPrices[i]) - float(oldPrices[i])) / float(oldPrices[i]))
             weightedRet = retOnAsset*(amounts[i]/totalShares)
             rets += [weightedRet]
-    return [sum(rets)]
+            weightedBeta = betas[i]*(amounts[i]/totalShares)
+            weightedBetas += [weightedBeta]
+            weights += [(amounts[i]/totalShares)]
+    return [sum(rets)], [sum(weightedBetas)], weights
+
+def getRiskFreeRate():
+    # Using 2 year treasury
+    twoYearTreas = pd.read_csv("https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1168&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=DGS2&scale=left&cosd=2015-06-10&coed=2020-06-10&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Daily&fam=avg&fgst=lin&fgsnd=2009-06-01&line_index=1&transformation=lin&vintage_date=2020-06-11&revision_date=2020-06-11&nd=1976-06-01")
+    return twoYearTreas['DGS2'].values.tolist()[-1]
+
+def calcStdOfReturns(tickers):
+    std = []
+    masterDf = pd.DataFrame()
+    if tickers != []:
+        for ticker in tickers:
+            # approx 2 years of data
+            start = int(time.mktime((datetime.today() - timedelta(days=740)).timetuple()))
+            download_quotes(ticker, start, None)
+            df = pd.read_csv(ticker + ".csv")
+            df = df['Close']
+            std += [round(df.std() / 100,2)]
+            df.rename(ticker, inplace=True)
+            if masterDf.empty:
+                masterDf = df
+            else:
+                masterDf = pd.concat([masterDf, df], axis=1, join='inner')
+            os.remove(ticker + ".csv")
+    correlation = masterDf.corr()
+    return std, correlation
+
+def getPortStd(standDev, corrs, weights):
+    cols = corrs.columns
+    indexes = corrs.index
+    corrsCalcs = []
+    for i in range(len(cols)):
+        corrsCalcs += [(weights[i]**2)*((standDev[i])**2)]
+        for j in range(len(indexes)):
+            if cols[i] != indexes[j]:
+                stdA = standDev[i]
+                stdB = standDev[j]
+                wA = weights[i]
+                wB = weights[j]
+                currCorr = corrs.loc[indexes[j], cols[i]]
+                corrsCalcs += [2*wA*wB*stdA*stdB*currCorr]
+    return sum(list(set(corrsCalcs)))
+
+def getSharpeRatio(ret, std):
+    riskfree = getRiskFreeRate()
+    return round((float(ret[0]) - float(riskfree)) / float(std), 2)
+
+def getTreynorRatio(ret, beta):
+    riskfree = getRiskFreeRate()
+    return round((float(ret[0]) - float(riskfree)) / float(beta[0]), 2)

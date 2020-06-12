@@ -13,7 +13,7 @@ from datareader import *
 import os
 import pandas as pd
 import numpy as np
-from companyStatScraper import *
+import companyStatScraper
 from EquityVisualizerContent import EQUITY_VISUALIZER_CONTENT
 from AboutContent import ABOUT_CONTENT
 from PmContent import PM_CONTENT
@@ -576,11 +576,13 @@ def addRowToPm(timestamp, n_clicks, posData, localData):
 #################################
 # MODIFY ROW FROM STOCK TABLE ON INPUT TABLE DELETION OR ADDITION
 #################################
+correlations = pd.DataFrame()
 @app.callback(Output('srTable', 'data'),
               [Input('posTable', 'data')],
               [State('srTable', 'data')]
 )
 def modifyStockRow(inputData, stockData):
+    global correlations
     inpDf = pd.DataFrame(inputData)
     listData = inpDf.values.flatten()
     # Differentiate between one stock with blank values and lots of stocks where only one has blank values
@@ -602,18 +604,20 @@ def modifyStockRow(inputData, stockData):
                 toAdd = inpDf[~inpDf['Ticker'].isin(sDf['Ticker'].values.tolist())]
             tickerList = toAdd['Ticker'].values.tolist()
             oldPrice = toAdd["$ Initially Invested Per Share"]
-            markPrice = getCurrMarketPrice(tickerList)
-            ret = calcStockReturn(oldPrice.values.tolist(), markPrice)
-            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "Return": ret})
+            markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
+            stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
+            ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
+            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
             if sDf.empty:
                 sDf = stockInfoDf
             else:
                 sDf = sDf.append(stockInfoDf)
         else:
             oldPrice = inpDf["$ Initially Invested Per Share"]
-            markPrice = getCurrMarketPrice(inpTickers)
-            ret = calcStockReturn(oldPrice.values.tolist(), markPrice)
-            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "Return": ret})
+            markPrice, betas = companyStatScraper.getCurrMarketPrice(inpTickers)
+            stds, correlations = companyStatScraper.calcStdOfReturns(inpTickers)
+            ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
+            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
         return sDf.to_dict('records')
 
 
@@ -625,6 +629,7 @@ def modifyStockRow(inputData, stockData):
               [State('posTable', 'data'), State('pmTable', 'data')]
 )
 def fixPMReturn(stockData, inputData, portData):
+    global correlations
     inpDf = pd.DataFrame(inputData)
     listData = inpDf.values.flatten()
     if len(listData) == 3 and '' in listData:
@@ -633,9 +638,13 @@ def fixPMReturn(stockData, inputData, portData):
         return portData
     else:
         sDf = pd.DataFrame(stockData)
-        newRet = calcPortReturn(inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(), sDf['Current Market Price'].astype(float).values.tolist(),
-                       inpDf['No. Of Shares Held'].astype(float).values.tolist())
-        newRetDf = pd.DataFrame({'Return': [newRet]})
+        newRet, portBeta, weights = companyStatScraper.calcPortReturn(inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(), sDf['Current Market Price'].astype(float).values.tolist(),
+                       inpDf['No. Of Shares Held'].astype(float).values.tolist(), sDf['Beta'].astype(float).values.tolist())
+        portStd = companyStatScraper.getPortStd(sDf['Standard Deviation'], correlations, weights)
+        sharpe = companyStatScraper.getSharpeRatio(newRet, portStd)
+        treynor = companyStatScraper.getTreynorRatio(newRet, portBeta)
+        newRetDf = pd.DataFrame({'Portfolio Return': newRet, "Portfolio Beta": [round(portBeta[0], 2)], "Portfolio Standard Deviation": portStd,
+                                 "Sharpe Ratio": sharpe, 'Treynor Ratio': treynor})
         return newRetDf.to_dict('records')
 
 
