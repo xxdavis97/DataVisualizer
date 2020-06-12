@@ -36,7 +36,7 @@ app.layout = html.Div(children= [
     html.Div(className="navBar", children=[
         html.Ul(children=[
             dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
-            dcc.Link(html.Li("Porfotlio Manager"), href="/pm", className="borderLi", refresh=True),
+            dcc.Link(html.Li("Portfolio Manager"), href="/pm", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
     ]),
@@ -687,6 +687,6 @@ def storeSession(inputData):
 ##################################################################
 if __name__ == '__main__':
     # For deployment
-    # application.run(debug=True, host='0.0.0.0', port='80')
+    application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    application.run(debug=False)
+    # application.run(debug=False)
