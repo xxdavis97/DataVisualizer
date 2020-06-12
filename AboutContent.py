@@ -33,7 +33,7 @@ ABOUT_CONTENT = html.Div(children= [
                 ])
             ])
         ]),
-    ], className="row aboutRow1 aboutRow"),
+    ], className="row topRow aboutRow"),
     html.Br(),
     html.Div(className="row aboutRow", children=[
         html.H2("Work Experience", className="aboutHeader")

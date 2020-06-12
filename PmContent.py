@@ -19,7 +19,7 @@ stockInfoInitDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": ma
 
 PM_CONTENT = html.Div(children= [
     dcc.Store(id='local', storage_type='local'),
-    html.Div(className="pmHowTo", children=[
+    html.Div(className="topRow", children=[
         html.Div(className="row aboutRow", children=[
             html.H2("Portfolio Management Tool", className="aboutHeader"),
             html.P("This app is designed to provide you with varying statistics based on the equities in your portfolio.  You may input the ticker "
