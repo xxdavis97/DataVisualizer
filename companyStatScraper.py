@@ -192,20 +192,18 @@ def calcPnL(oldPrices, newPrices, amounts):
             pnl += [round((float(newPrices[i]*float(amounts[i])) - float(oldPrices[i]*float(amounts[i]))), 2)]
     return pnl
 
-def calcPortReturn(oldPrices, newPrices, amounts, betas):
-    totalShares = sum(amounts)
+def calcPortReturn(oldPrices, newPrices, weights, betas):
     rets = []
     weightedBetas = []
-    weights = []
+    # weights = []
     if newPrices != []:
         for i in range(len(oldPrices)):
             retOnAsset = ((float(newPrices[i]) - float(oldPrices[i])) / float(oldPrices[i]))
-            weightedRet = retOnAsset*(amounts[i]/totalShares)
+            weightedRet = retOnAsset*(weights[i])
             rets += [weightedRet]
-            weightedBeta = betas[i]*(amounts[i]/totalShares)
+            weightedBeta = betas[i]*(weights[i])
             weightedBetas += [weightedBeta]
-            weights += [(amounts[i]/totalShares)]
-    return [sum(rets)], [sum(weightedBetas)], weights
+    return [sum(rets)], [sum(weightedBetas)]
 
 def getRiskFreeRate():
     # Using 2 year treasury
