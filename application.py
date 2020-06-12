@@ -19,7 +19,7 @@ from AboutContent import ABOUT_CONTENT
 from PmContent import PM_CONTENT
 from sentimentContent import SENTIMENT_CONTENT
 import time
-import plotly
+import plotly.graph_objects as go
 
 #################################
 # INIT DASH AND FLASK
@@ -715,19 +715,19 @@ def updateSentiment(n):
             y -= 1
         xar.append(x)
         yar.append(y)
-    fig = plotly.tools.make_subplots(rows=2, cols=1, vertical_spacing=0.2)
+    fig = go.Figure()
     fig['layout']['margin'] = {
         'l': 30, 'r': 10, 'b': 30, 't': 10
     }
     fig['layout']['legend'] = {'x': 0, 'y': 1, 'xanchor': 'left'}
-    fig.append_trace({
+    fig.add_trace({
         'x': xar,
         'y': yar,
         'mode': 'lines',
         'type': 'scatter'
-    }, 1, 1)
-    fig.update_xaxes(title_text="# Of Tweets", row=1, col=1)
-    fig.update_yaxes(title_text="Sentiment", row=1, col=1)
+    })
+    fig.update_xaxes(title_text="# Of Tweets")
+    fig.update_yaxes(title_text="Sentiment")
     return fig
 
 ##################################################################
@@ -738,4 +738,3 @@ if __name__ == '__main__':
     application.run(debug=True, host='0.0.0.0', port='80')
     # For local
     # application.run(debug=False)
-    # eat my cock
