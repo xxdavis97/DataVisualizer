@@ -64,11 +64,12 @@ PM_CONTENT = html.Div(children= [
         ]),
     ]),
     html.Div(id="stockInfo", className="tableWrapper row", children=[
-        html.Div(id="stockResultsTable", className="pmTable", children=[
+        html.Div(id="stockResultsTable", className="pmTableStock", children=[
             dash_table.DataTable(
                 id='srTable',
                 columns=[{"id": "Ticker", "name": "Ticker", "type": "text"},
                          {"id": "Current Market Price", "name": "Current Market Price", "type": "numeric"},
+                         {"id": "% Of Portfolio", "name": "% Of Portfolio", "type": "numeric", 'format': FormatTemplate.percentage(2)},
                          {"id": "PnL", "name": "PnL", "type": "numeric"},
                          {"id": "Return", "name": "Return","type": "numeric", 'format': FormatTemplate.percentage(2).sign(Sign.positive)},
                          {"id": "Beta", "name": "Beta", "type": "numeric"},
