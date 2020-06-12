@@ -1,9 +1,9 @@
-import requests as re
 from bs4 import BeautifulSoup
 import pickle
 import os
 import pandas as pd
-from datareader import download_quotes
+from datareader import YahooFinanceHistory
+import requests as re
 import time
 from datetime import datetime, timedelta
 
@@ -220,8 +220,10 @@ def calcStdOfReturns(tickers):
         for ticker in tickers:
             # approx 2 years of data
             start = int(time.mktime((datetime.today() - timedelta(days=740)).timetuple()))
-            download_quotes(ticker, start, None)
-            df = pd.read_csv(ticker + ".csv")
+            # download_quotes(ticker, start, None)
+            # print(ticker)
+            df = YahooFinanceHistory(ticker, start, None).download_quotes()
+            # df = pd.read_csv(ticker + ".csv")
             df = df['Close']
             std += [round(df.std() / 100,2)]
             df.rename(ticker, inplace=True)
@@ -229,7 +231,6 @@ def calcStdOfReturns(tickers):
                 masterDf = df.to_frame()
             else:
                 masterDf = pd.concat([masterDf, df], axis=1, join='inner')
-            os.remove(ticker + ".csv")
     correlation = masterDf.corr()
     return std, correlation
 

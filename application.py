@@ -147,7 +147,8 @@ def update_value(input_data, start, end, bollinger, candle):
             f.close()
     else:
         if start is None or end is None or start == "":
-            download_quotes(input_data,None,None)
+            # download_quotes(input_data,None,None)
+            df = YahooFinanceHistory(input_data, None, None).download_quotes()
         else:
             # print((datetime.strptime(start,"%Y-%m-%d") - BDay(200)))
             # start = int(time.mktime((datetime.strptime(start,"%Y-%m-%d") - BDay(200)).timetuple()))
@@ -156,14 +157,15 @@ def update_value(input_data, start, end, bollinger, candle):
                 end = int(time.mktime(datetime.strptime(datetime.strftime(datetime.today(),"%Y-%m-%d"),"%Y-%m-%d").timetuple()))
             else:
                 end = int(time.mktime(datetime.strptime(end,"%Y-%m-%d").timetuple()))
-            download_quotes(input_data,start,end)
-        df = pd.read_csv(input_data + ".csv")
+            # download_quotes(input_data,start,end)
+            df = YahooFinanceHistory(input_data, start, end).download_quotes()
+        # df = pd.read_csv(input_data + ".csv")
         if origStart is not None and origStart != "":
             graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = df.copy()
         # graphicalData.reset_index(inplace=True, drop=True)
-        os.remove(input_data + ".csv")
+        # os.remove(input_data + ".csv")
     if toPickle:
         import pickle
         if not os.path.exists("backupData/{0}".format(input_data)):
@@ -611,16 +613,19 @@ def modifyStockRow(inputData, stockData):
             oldPrice = toAdd["$ Initially Invested Per Share"]
             quantityHeld = toAdd['No. Of Shares Held'].values.tolist()
             markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
-            stockValue = toAdd['No. Of Shares Held'] * markPrice
+            stockValue = inpDf['No. Of Shares Held'] * markPrice
             stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
-            percOfPort = (stockValue / stockValue.sum()).values.tolist()
+            percOfPort = (stockValue / stockValue.sum()).values.tolist()[-1*len(tickerList):]
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
             stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
             if sDf.empty:
                 sDf = stockInfoDf
             else:
                 sDf = sDf.append(stockInfoDf)
+                stockValue = pd.Series(inpDf['No. Of Shares Held'].values * sDf['Current Market Price'].values)
+                percOfPort = (stockValue / stockValue.sum()).values.tolist()
+                sDf['% Of Portfolio'] = percOfPort
         else:
             oldPrice = inpDf["$ Initially Invested Per Share"]
             quantityHeld = inpDf['No. Of Shares Held'].values.tolist()
@@ -631,6 +636,8 @@ def modifyStockRow(inputData, stockData):
             percOfPort = (stockValue / stockValue.sum()).values.tolist()
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
             sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+        # for ticker in sDf['Ticker'].values.tolist():
+        #     os.remove(ticker + ".csv")
         return sDf.to_dict('records')
 
 
@@ -680,6 +687,6 @@ def storeSession(inputData):
 ##################################################################
 if __name__ == '__main__':
     # For deployment
-    application.run(debug=True, host='0.0.0.0', port='80')
+    # application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    # application.run(debug=False)
+    application.run(debug=False)
