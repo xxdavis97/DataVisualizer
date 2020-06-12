@@ -17,6 +17,9 @@ import companyStatScraper
 from EquityVisualizerContent import EQUITY_VISUALIZER_CONTENT
 from AboutContent import ABOUT_CONTENT
 from PmContent import PM_CONTENT
+from sentimentContent import SENTIMENT_CONTENT
+import time
+import plotly
 
 #################################
 # INIT DASH AND FLASK
@@ -37,6 +40,7 @@ app.layout = html.Div(children= [
         html.Ul(children=[
             dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
             dcc.Link(html.Li("Portfolio Manager"), href="/pm", className="borderLi", refresh=True),
+            dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
     ]),
@@ -66,7 +70,7 @@ for stylesheet in stylesheets:
 #################################
 # SERVE IMAGES
 #################################
-list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png']
+list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png', 'bannerSentiment.png']
 @app.server.route('{}<image_path>.png'.format(static_css_route))
 def serve_image(image_path):
     image_name = '{}.png'.format(image_path)
@@ -90,6 +94,8 @@ def serveWebPage(pathname):
         return ABOUT_CONTENT
     elif pathname == "/pm":
         return PM_CONTENT
+    elif pathname == "/sentiment":
+        return SENTIMENT_CONTENT
     else:
         return ""
 
@@ -108,6 +114,8 @@ def serveBanner(pathname):
         return "/assets/bannerAbout.png"
     elif pathname == "/pm":
         return "/assets/bannerPm.png"
+    elif pathname == "/sentiment":
+        return "/assets/bannerSentiment.png"
     else:
         return "/assets/banner404.png"
 
@@ -681,6 +689,46 @@ def storeSession(inputData):
     df = pd.DataFrame(inputData)
     return df.to_json(orient="split")
 
+
+##################################################################
+# TWITTER SENTIMENT CALLBACKS
+##################################################################
+
+
+#################################
+# DYNAMICALLY UPDATES GRAPH
+#################################
+@app.callback(Output('sentiment-graph', 'figure'),
+              [Input('sentiment-interval', 'n_intervals')])
+def updateSentiment(n):
+    pullData = open("twitter-out.txt","r").read()
+    lines = pullData.split('\n')
+    xar = []
+    yar = []
+    x = 0
+    y = 0
+    for l in lines[-300:]:
+        x += 1
+        if "pos" in l:
+            y += 1
+        elif "neg" in l:
+            y -= 1
+        xar.append(x)
+        yar.append(y)
+    fig = plotly.tools.make_subplots(rows=2, cols=1, vertical_spacing=0.2)
+    fig['layout']['margin'] = {
+        'l': 30, 'r': 10, 'b': 30, 't': 10
+    }
+    fig['layout']['legend'] = {'x': 0, 'y': 1, 'xanchor': 'left'}
+    fig.append_trace({
+        'x': xar,
+        'y': yar,
+        'mode': 'lines',
+        'type': 'scatter'
+    }, 1, 1)
+    fig.update_xaxes(title_text="# Of Tweets", row=1, col=1)
+    fig.update_yaxes(title_text="Sentiment", row=1, col=1)
+    return fig
 
 ##################################################################
 # RUN APPLICATION
