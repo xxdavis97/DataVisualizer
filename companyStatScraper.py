@@ -164,10 +164,18 @@ def getCurrMarketPrice(tickers):
             url = "https://finance.yahoo.com/quote/{0}?p={0}".format(ticker)
             site = re.get(url)
             soup = BeautifulSoup(site.content)
-            price = soup.find_all("span")[14].text
-            beta = soup.find_all('table')[1].find_all('tr')[1].find_all('span')[1].text
-            prices += [float(price)]
-            betas += [float(beta)]
+            # Stock
+            try:
+                price = soup.find_all("span")[14].text
+                beta = soup.find_all('table')[1].find_all('tr')[1].find_all('span')[1].text
+                prices += [float(price)]
+                betas += [float(beta)]
+            # ETF
+            except:
+                price = soup.find_all("span")[11].text
+                beta = soup.find_all('table')[1].find_all('tr')[5].find_all('span')[1].text
+                prices += [float(price)]
+                betas += [float(beta)]
     return prices, betas
 
 def calcStockReturn(oldPrices, newPrices):
@@ -217,7 +225,7 @@ def calcStdOfReturns(tickers):
             std += [round(df.std() / 100,2)]
             df.rename(ticker, inplace=True)
             if masterDf.empty:
-                masterDf = df
+                masterDf = df.to_frame()
             else:
                 masterDf = pd.concat([masterDf, df], axis=1, join='inner')
             os.remove(ticker + ".csv")

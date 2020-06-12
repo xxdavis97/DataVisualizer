@@ -604,7 +604,7 @@ def modifyStockRow(inputData, stockData):
                 toAdd = inpDf[~inpDf['Ticker'].isin(sDf['Ticker'].values.tolist())]
             tickerList = toAdd['Ticker'].values.tolist()
             oldPrice = toAdd["$ Initially Invested Per Share"]
-            quantityHeld = toAdd['No. Of Shares Held']
+            quantityHeld = toAdd['No. Of Shares Held'].values.tolist()
             markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
             stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
