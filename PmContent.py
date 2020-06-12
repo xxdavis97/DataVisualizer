@@ -34,7 +34,9 @@ PM_CONTENT = html.Div(children= [
                 html.Li("If you accidentally do make multiple changes before waiting for an update I recommend doing a page refresh, it will be much more efficient "
                         "than letting the algorithm figure itself out"),
                 html.Li("Do not have blank cells or rows, the bottom two tables only update when the input table is full"),
-                html.Li("After you input a row, click onto a different cell within the table to trigger the event that updates the webpage")
+                html.Li("After you input a row, click onto a different cell within the table to trigger the event that updates the webpage"),
+                html.Li("Occasionally Yahoo blocks our connection to their servers, if the first table is fully filled in, all tickers are real, the tab "
+                        "doesn't say \"Updating\" and the last two tables are blank/don't update, try refreshing the page to fix the connection to Yahoo")
             ]),
             html.Strong("*Note* Generating the porftolio statistics table is extremely data intensive and involves a lot of computation, "
                         "if you add too many assets to your portfolio you may notice severe hangups in load time")
@@ -191,6 +193,8 @@ PM_CONTENT = html.Div(children= [
                     },
                 ],
                 data=[""],
+                # export_format='xlsx',
+                # export_headers='name',
             ),
         ])
     ]),
