@@ -159,6 +159,34 @@ def getFundOwnership(ticker):
         # return [instFrame, mutualFrame]
         return [instFrame]
 
+def getOptionsData(ticker):
+    global toPickle
+    global usePickle
+    if usePickle:
+        with open("./backupData/{0}/{0}-Option-Data".format(ticker), 'rb') as f:
+            pick = pickle.load(f)
+            f.close()
+            return pick
+    else:
+        url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker)
+        site = re.get(url)
+        soup = BeautifulSoup(site.content)
+        expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
+        print(soup.find_all("section")[1].find("div").prettify())
+        # optionTable = soup.find("table")
+        # headerRow = optionTable.find_all("th")
+        optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker))[0]
+        optionFrame.drop(["Change", "% Change", "Change.1", "% Change.1", "Volume", "Volume.1"], inplace=True, axis=1)
+        if toPickle:
+            if not os.path.exists("backupData/{0}".format(ticker)):
+                os.mkdir("backupData/{0}".format(ticker))
+            with open("./backupData/{0}/{0}-Option-Data".format(ticker), 'wb') as f:
+                pickle.dump([optionFrame], f)
+                f.close()
+        return [expiry, optionFrame]
+
+getOptionsData("C")
+
 def getCurrMarketPrice(tickers):
     prices = []
     betas = []
