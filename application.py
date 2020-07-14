@@ -41,7 +41,7 @@ app.layout = html.Div(children= [
         html.Ul(children=[
             dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
             dcc.Link(html.Li("Portfolio Manager"), href="/pm", className="borderLi", refresh=True),
-            dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
+            # dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
     ]),
