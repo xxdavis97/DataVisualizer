@@ -172,7 +172,7 @@ def getOptionsData(ticker):
         site = re.get(url)
         soup = BeautifulSoup(site.content)
         expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
-        # TODO: Pick option expiry
+        # TODO: Pick option expiry https://stackoverflow.com/questions/28680896/how-can-i-get-the-3rd-friday-of-a-month-in-python
         # cycleOne = ["January", "April", "July", "October"]
         # cycleTwo = ["February", "May", "August", "November"]
         # cycleThree = ["March", "June", "September", "December"]
@@ -187,8 +187,6 @@ def getOptionsData(ticker):
                 pickle.dump([optionFrame], f)
                 f.close()
         return [expiry, optionFrame]
-
-getOptionsData("C")
 
 def getCurrMarketPrice(tickers):
     prices = []
