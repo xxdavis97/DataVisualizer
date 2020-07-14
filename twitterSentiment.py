@@ -11,9 +11,11 @@ consumer_secret = "H2tH8OLcb7j5tjFrRJNTyxZilzgoKE2OlQzaXfGeyYm1LMvdEc"
 access_token = "1044066351638286336-Mvif5sOzBnS2JEDjaoByH8rlvAKMaX"
 access_secret = "Aw4QERisoqoj2kIAIrCugfObDUPyHp1DTPUxr1kzWeDSl"
 
-class listener(StreamListener):
+testList = []
 
+class listener(StreamListener):
     def on_data(self, data):
+        global testList
         all_data = json.loads(data)
 
         tweet = all_data["text"]
@@ -23,6 +25,11 @@ class listener(StreamListener):
         if confidence * 100 >= 80:
             output = open("twitter-out.txt", "a")
             output.write(sentiment_value)
+            testList += [sentiment_value]
+            # if len(testList) > 120:
+            #     testList = testList[-100:]
+            #     print(len(testList))
+
             output.write('\n')
             output.close()
 

@@ -177,6 +177,7 @@ def getCurrMarketPrice(tickers):
             except:
                 price = soup.find_all("span")[11].text
                 beta = soup.find_all('table')[1].find_all('tr')[5].find_all('span')[1].text
+                print(soup.find_all('table')[1])
                 prices += [float(price)]
                 betas += [float(beta)]
     return prices, betas
