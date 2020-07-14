@@ -172,7 +172,10 @@ def getOptionsData(ticker):
         site = re.get(url)
         soup = BeautifulSoup(site.content)
         expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
-        print(soup.find_all("section")[1].find("div").prettify())
+        # TODO: Pick option expiry
+        # cycleOne = ["January", "April", "July", "October"]
+        # cycleTwo = ["February", "May", "August", "November"]
+        # cycleThree = ["March", "June", "September", "December"]
         # optionTable = soup.find("table")
         # headerRow = optionTable.find_all("th")
         optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker))[0]
