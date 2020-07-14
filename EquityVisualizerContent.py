@@ -59,7 +59,8 @@ EQUITY_VISUALIZER_CONTENT = html.Div(children= [
     ], className="row"),
     html.Div(id="fundOwnership", children=[
         html.Div(id="top-institutional", className="six columns owner"),
+        html.Div(id="options", className="six columns owner"),
         # html.Div(id="top-mutual", className="six columns owner"),
 
-    ], className="row"),
+    ], className="row bottomRow"),
 ])

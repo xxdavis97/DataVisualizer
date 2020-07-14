@@ -516,7 +516,12 @@ html {
 .owner {
 	padding: 15px 15px;
   max-height: 500px;
-  overflow-y: auto;
+  /*overflow-y: auto;*/
+}
+
+#optTable {
+  /*overflow: auto;*/
+  max-height: 350px;
 }
 
 .nav-bar {
@@ -559,10 +564,6 @@ a:hover {
   border-radius: 20px;
   /*margin-left: 10%;*/
   margin-top: 1%;
-}
-
-.aboutRow1 {
-  margin-top: 20px;
 }
 
 #selfie {
@@ -656,10 +657,6 @@ h6 {
   border-color: #ff8566;
 }
 
-.pmHowTo {
-  margin-top: 20px;
-}
-
 #pmInfo {
   margin-bottom: 20px;
 }
@@ -675,4 +672,8 @@ h6 {
 
 .topRow {
   margin-top: 20px;
+}
+
+.bottomRow {
+  margin-bottom: 200px;
 }
