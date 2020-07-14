@@ -20,6 +20,7 @@ from PmContent import PM_CONTENT
 from sentimentContent import SENTIMENT_CONTENT
 import time
 import plotly.graph_objects as go
+from twitterSentiment import testList
 
 #################################
 # INIT DASH AND FLASK
@@ -701,13 +702,15 @@ def storeSession(inputData):
 @app.callback(Output('sentiment-graph', 'figure'),
               [Input('sentiment-interval', 'n_intervals')])
 def updateSentiment(n):
-    pullData = open("twitter-out.txt","r").read()
-    lines = pullData.split('\n')
+    global testList
+    # pullData = open("twitter-out.txt","r").read()
+    # lines = pullData.split('\n')
     xar = []
     yar = []
     x = 0
     y = 0
-    for l in lines[-300:]:
+    # for l in lines[-300:]:
+    for l in testList[-100:]:
         x += 1
         if "pos" in l:
             y += 1
