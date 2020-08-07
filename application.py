@@ -738,7 +738,7 @@ def fixPMReturn(stockData, inputData, portData):
 
 
 #################################
-# STORE STOCK SELECTIONS SO YOU DONT HAVE TO INPUT IT EVERY TIME
+# STORE STOCK SELECTIONS SO YOU DON'T HAVE TO INPUT IT EVERY TIME
 #################################
 @app.callback(
     Output('local', 'data'),

@@ -198,7 +198,7 @@ def getCurrMarketPrice(tickers):
             soup = BeautifulSoup(site.content)
             # Stock
             try:
-                price = soup.find_all("span")[14].text
+                price = soup.find_all("span")[27].text
                 beta = soup.find_all('table')[1].find_all('tr')[1].find_all('span')[1].text
                 prices += [float(price)]
                 betas += [float(beta)]
