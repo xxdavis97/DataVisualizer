@@ -515,18 +515,18 @@ def topInstitutional(ticker):
 def optionsData(ticker):
     try:
         getData = companyStatScraper.getOptionsData(ticker)
-        print(getData)
         expiry = getData[0]
         data = getData[1]
         header = html.H2("Options Expiring on {0}".format(expiry), className="graphHead title")
-        # cols = [
-        #     {"name": ["Calls", "Last Price"], "id": "Last Price"},
-        #     {"name": ["Calls", "Open Interest"], "id": "Open Interest"},
-        #     {"name": ["", "Strike"], "id": "Strike"},
-        #     {"name": ["Puts", "Last Price"], "id": "Last Price.1"},
-        #     {"name": ["Puts", "Open Interest"], "id": "Open Interest.1"},
-        # ]
-        cols = [{"name": i, "id": i} for i in getData.columns]
+        cols = [
+            {"name": ["Calls", "Last Price"], "id": "Last Price"},
+            {"name": ["Calls", "Open Interest"], "id": "Open Interest"},
+            {"name": ["", "Strike"], "id": "Strike"},
+            {"name": ["", ""], "id": ""},
+            {"name": ["Puts", "Last Price"], "id": "Last Price.1"},
+            {"name": ["Puts", "Open Interest"], "id": "Open Interest.1"},
+        ]
+        # cols = [{"name": i, "id": i} for i in data.columns]
         # TODO: https://dash.plotly.com/datatable/conditional-formatting can highlight in/out of the money options
         table = dash_table.DataTable(
             id='optTable',
@@ -556,7 +556,7 @@ def optionsData(ticker):
             style_cell={'textAlign': 'center'},
             css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'},
                  {"selector": ".dash-header", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
-            # merge_duplicate_headers=True,
+            merge_duplicate_headers=True,
         )
         return [header, table]
     except:
