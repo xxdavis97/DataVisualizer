@@ -21,6 +21,7 @@ from sentimentContent import SENTIMENT_CONTENT
 import time
 import plotly.graph_objects as go
 from twitterSentiment import testList
+from logger import logError, logDf
 
 #################################
 # INIT DASH AND FLASK
@@ -517,7 +518,6 @@ def optionsData(ticker):
         getData = companyStatScraper.getOptionsData(ticker)
         expiry = getData[0]
         data = getData[1]
-        from logger import logDf
         logDf(data, "optionsData")
         header = html.H2("Options Expiring on {0}".format(expiry), className="graphHead title")
         cols = [
@@ -562,7 +562,6 @@ def optionsData(ticker):
         )
         return [header, table]
     except Exception as e:
-        from logger import logError
         logError(e, "optionsData")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
