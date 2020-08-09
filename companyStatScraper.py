@@ -199,7 +199,14 @@ def getCurrMarketPrice(tickers):
             # Stock
             try:
                 price = soup.find_all("span")[27].text
-                beta = soup.find_all('table')[1].find_all('tr')[1].find_all('span')[1].text
+                rows = soup.find_all('table')[1].find_all('tr')
+                tableSpans = rows[1].find_all('span')
+                metric = tableSpans[0]
+                # ETF
+                if metric.text == "NAV":
+                    beta = rows[5].find_all('span')[1].text
+                else:
+                    beta = tableSpans[1].text
                 prices += [float(price)]
                 betas += [float(beta)]
             # ETF
