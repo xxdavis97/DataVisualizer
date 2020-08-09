@@ -19,8 +19,8 @@ class listener(StreamListener):
         global testList
         all_data = json.loads(data)
         tweet = all_data["text"]
-        logTweets(tweet)
         sentiment_value, confidence = s.sentiment(tweet)
+        logTweets(sentiment_value)
         # print(tweet, sentiment_value, confidence)
 
         if confidence * 100 >= 80:
