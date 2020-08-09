@@ -203,9 +203,6 @@ def getCurrMarketPrice(tickers):
                 tableSpans = rows[1].find_all('span')
                 metric = tableSpans[0]
                 # ETF
-                if metric.text[0:4] != "Beta":
-                    from logger import logHTML
-                    logHTML(rows, "getCurrMarketPrice")
                 if metric.text == "NAV":
                     beta = rows[5].find_all('span')[1].text
                 else:
