@@ -73,12 +73,12 @@ def logTwitterFile(lines):
 
 def logTweets(tweet):
     if not os.path.exists("tweetLog.txt"):
-        with open("tweetLog.txt", "w+") as f:
-            f.write(str(tweet) + "\n")
+        with open("tweetLog.txt", "wb+") as f:
+            f.write(bytes(tweet, "utf16") + bytes("\n", "utf16"))
             f.close()
     else:
-        with open("tweetLog.txt", "a") as f:
-            f.write(str(tweet) + "\n")
+        with open("tweetLog.txt", "ab") as f:
+            f.write(bytes(tweet, "utf16") + bytes("\n", "utf16"))
             f.close()
 
 def logTwitterError(status):
