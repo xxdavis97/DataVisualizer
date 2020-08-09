@@ -375,7 +375,8 @@ def shareOwnershipChart(ticker):
                     # 'layout': layout
                 }
             )]
-    except:
+    except Exception as e:
+        logError(e, "shareOwnershipChart")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
@@ -388,35 +389,36 @@ def shareOwnershipChart(ticker):
     [Input(component_id="Symbolinput", component_property="value")]
 )
 def shortShareTable(ticker):
-    # try:
-    getData = companyStatScraper.getShortShares(ticker)
-    dataDf = pd.DataFrame({"1": getData[0], "2": getData[1]})
-    header = html.H2("Short Position Information", className="graphHead")
-    table = dash_table.DataTable(
-        id='shortTableInner',
-        columns=[{"name": i, "id": i} for i in dataDf.columns],
-        data= dataDf.to_dict('records'),
-        style_header={
-            'display': 'none'
-        },
-        style_data_conditional=[
-            {
-                'if': {'row_index': 'even'},
-                'backgroundColor': '#3399ff'
-            }
-        ],
-        style_data={
-            'whiteSpace': 'normal',
-            'height': 'auto',
-            'lineHeight': '15px'
-        },
-        style_cell={'textAlign': 'center'},
-        css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
-    )
-    return [header,table]
-    # except:
-    #     # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
-    #     return ""
+    try:
+        getData = companyStatScraper.getShortShares(ticker)
+        dataDf = pd.DataFrame({"1": getData[0], "2": getData[1]})
+        header = html.H2("Short Position Information", className="graphHead")
+        table = dash_table.DataTable(
+            id='shortTableInner',
+            columns=[{"name": i, "id": i} for i in dataDf.columns],
+            data= dataDf.to_dict('records'),
+            style_header={
+                'display': 'none'
+            },
+            style_data_conditional=[
+                {
+                    'if': {'row_index': 'even'},
+                    'backgroundColor': '#3399ff'
+                }
+            ],
+            style_data={
+                'whiteSpace': 'normal',
+                'height': 'auto',
+                'lineHeight': '15px'
+            },
+            style_cell={'textAlign': 'center'},
+            css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
+        )
+        return [header,table]
+    except Exception as e:
+        logError(e, "shortShareTable")
+        # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
+        return ""
 
 
 #################################
@@ -445,7 +447,8 @@ def earningsChart(ticker):
                     # 'width': 1200,
                 },
             )]
-    except:
+    except Exception as e:
+        logError(e, "earningsChart")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
@@ -462,7 +465,8 @@ def companyBio(ticker):
         getData = companyStatScraper.getCompanyBio(ticker)
         header = html.H2("About {0}".format(ticker), className="graphHead snap")
         return [header, html.P(getData, className="bio")]
-    except:
+    except Exception as e:
+        logError(e, "companyBio")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
@@ -502,7 +506,8 @@ def topInstitutional(ticker):
                  {"selector": ".dash-header", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
         )
         return [header, table]
-    except:
+    except Exception as e:
+        logError(e, "topInstitutional")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
@@ -518,7 +523,6 @@ def optionsData(ticker):
         getData = companyStatScraper.getOptionsData(ticker)
         expiry = getData[0]
         data = getData[1]
-        logDf(data, "optionsData")
         header = html.H2("Options Expiring on {0}".format(expiry), className="graphHead title")
         cols = [
             {"name": ["Calls", "Last Price"], "id": "Last Price"},
