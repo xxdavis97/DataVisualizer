@@ -62,11 +62,31 @@ def logHTML(listOfElements, funcName=""):
             f.close()
 
 def logTwitterFile(lines):
-    if not os.path.exists("tweetLog.txt"):
-        with open("tweetLog.txt", "w+") as f:
+    if not os.path.exists("twitterLog.txt"):
+        with open("twitterLog.txt", "w+") as f:
             f.write(str(len(lines)) + "\n")
             f.close()
     else:
-        with open("tweetLog.txt", "a") as f:
+        with open("twitterLog.txt", "a") as f:
             f.write(str(len(lines)) + "\n")
+            f.close()
+
+def logTweets(tweet):
+    if not os.path.exists("tweetLog.txt"):
+        with open("tweetLog.txt", "w+") as f:
+            f.write(str(tweet) + "\n")
+            f.close()
+    else:
+        with open("tweetLog.txt", "a") as f:
+            f.write(str(tweet) + "\n")
+            f.close()
+
+def logTwitterError(status):
+    if not os.path.exists("twitterError.txt"):
+        with open("twitterError.txt", "w+") as f:
+            f.write(str(status) + "\n")
+            f.close()
+    else:
+        with open("twitterError.txt", "a") as f:
+            f.write(str(status) + "\n")
             f.close()
