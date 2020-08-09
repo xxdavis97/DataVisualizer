@@ -45,3 +45,18 @@ def logError(e, funcName=""):
             f.write(funcName + ":\n")
             f.write("    " + str(e))
             f.close()
+
+def logHTML(listOfElements, funcName=""):
+    if not os.path.exists("htmlLog.txt"):
+        with open("htmlLog.txt", "w+") as f:
+            f.write(funcName + ":\n")
+            for i in listOfElements:
+                f.write(i + "\n")
+            f.close()
+    else:
+        with open("htmlLog.txt", "a") as f:
+            f.write("\n\n\n")
+            f.write(funcName + ":\n")
+            for i in listOfElements:
+                f.write(i + "\n")
+            f.close()
