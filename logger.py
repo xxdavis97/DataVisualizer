@@ -32,3 +32,16 @@ def logDf(df, name=""):
                     f.write(str(values[i][j]) + " ")
                 f.write("\n")
             f.close()
+
+def logError(e, funcName=""):
+    if not os.path.exists("exceptionLog.txt"):
+        with open("exceptionLog.txt", "w+") as f:
+            f.write(funcName + ":\n")
+            f.write("    " + str(e))
+            f.close()
+    else:
+        with open("exceptionLog.txt", "a") as f:
+            f.write("\n\n\n")
+            f.write(funcName + ":\n")
+            f.write("    " + str(e))
+            f.close()
