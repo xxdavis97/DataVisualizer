@@ -4,10 +4,10 @@ import twitterSentiment
 import nltk
 
 # try:
-#     nltk.download('punkt')
-# except Exception as e:
-#     from logger import logError
-#     logError(e, "NLTK TOKEN")
+    nltk.download('punkt')
+except Exception as e:
+    from logger import logError
+    logError(e, "NLTK TOKEN")
 twitterSentiment.runStream()
 SENTIMENT_CONTENT = html.Div(children= [
     html.Div(children = [
