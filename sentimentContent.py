@@ -3,7 +3,7 @@ import dash_html_components as html
 import twitterSentiment
 import nltk
 
-# try:
+try:
     nltk.download('punkt')
 except Exception as e:
     from logger import logError
