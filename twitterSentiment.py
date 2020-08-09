@@ -3,6 +3,7 @@ from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import sentiment_mod as s
 import json
+from logger import logTwitterError, logTweets
 
 # TODO: Add tweepy, scipy, and nltk to requirements.txt
 
@@ -17,8 +18,8 @@ class listener(StreamListener):
     def on_data(self, data):
         global testList
         all_data = json.loads(data)
-
         tweet = all_data["text"]
+        logTweets(tweet)
         sentiment_value, confidence = s.sentiment(tweet)
         # print(tweet, sentiment_value, confidence)
 
@@ -36,6 +37,7 @@ class listener(StreamListener):
         return True
 
     def on_error(self, status):
+        logTwitterError(status)
         print(status)
 
 def runStream():
