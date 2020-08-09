@@ -4,7 +4,6 @@ from tweepy.streaming import StreamListener
 import sentiment_mod as s
 import json
 from logger import logTwitterError, logTweets, logError
-
 # TODO: Add tweepy, scipy, and nltk to requirements.txt
 
 consumer_key = "rdhYkY62dMnwclSGNUDfK44r4"

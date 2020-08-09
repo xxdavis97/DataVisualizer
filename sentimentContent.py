@@ -1,7 +1,9 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import twitterSentiment
+import nltk
 
+nltk.download()
 twitterSentiment.runStream()
 SENTIMENT_CONTENT = html.Div(children= [
     html.Div(children = [
