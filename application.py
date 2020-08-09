@@ -561,7 +561,9 @@ def optionsData(ticker):
             merge_duplicate_headers=True,
         )
         return [header, table]
-    except:
+    except Exception as e:
+        from logger import logError
+        logError(e, "optionsData")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
 
