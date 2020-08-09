@@ -20,7 +20,7 @@ from PmContent import PM_CONTENT
 from sentimentContent import SENTIMENT_CONTENT
 import time
 import plotly.graph_objects as go
-from twitterSentiment import testList
+import twitterSentiment
 from logger import logError, logDf, logTwitterFile
 
 #################################
@@ -97,6 +97,7 @@ def serveWebPage(pathname):
     elif pathname == "/pm":
         return PM_CONTENT
     elif pathname == "/sentiment":
+        twitterSentiment.garbageCollection()
         return SENTIMENT_CONTENT
     else:
         return ""
@@ -801,6 +802,6 @@ def updateSentiment(n):
 ##################################################################
 if __name__ == '__main__':
     # For deployment
-    application.run(debug=True, host='0.0.0.0', port='80')
+    # application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    # application.run(debug=False)
+    application.run(debug=False)

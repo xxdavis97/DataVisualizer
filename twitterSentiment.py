@@ -48,7 +48,19 @@ def runStream():
     auth.set_access_token(access_token, access_secret)
     twitterStream = Stream(auth, listener())
     twitterStream.filter(track=["S&P 500", "S&P", "Dow", "Dow Jones", "DJI", "Standard And Poors", "NASDAQ", "FANG",
-                                "QQQ", "Stock"], is_async=True)
+                                "QQQ", "Stock", "Federal Reserve", "Interest Rates", "Futures", "The Fed", "Bonds", "Treasury"], is_async=True)
+
+def garbageCollection():
+    pullData = open("twitter-out.txt", "r").read()
+    lines = pullData.split('\n')
+    if len(lines) > 4000:
+        lines = lines[-3500:]
+        import os
+        os.remove("twitter-out.txt")
+        with open("twitter-out.txt", "w+") as f:
+            for line in lines:
+                f.write(str(line) + "\n")
+            f.close()
 
 # Economy, markets, SPY
 # TODO: Make sure tweet is in english
