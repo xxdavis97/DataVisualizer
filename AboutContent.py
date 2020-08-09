@@ -70,7 +70,7 @@ ABOUT_CONTENT = html.Div(children= [
             # html.P("May-December 2018", className='datesWorked'),
             html.Ul(children=[
                 html.Li("Modified production level web applications using the Angular JavaScript framework, powered and optimized "
-                        "by a Neo4j Graph Databaseto allow for significantly improved performance over large datasets."),
+                        "by a Neo4j Graph Database to allow for significantly improved performance over large datasets."),
                 html.Li("Reporting to the CEO, headed the company’s switch to the Agile software development process using Atlassian’s JIRA."),
                 html.Li("Created a dashboard for top-level management, as well as developers, to gain insight into "
                         "the velocity of our team.  This enabled much better project planning and led to a dramatic increase in efficiency."),
