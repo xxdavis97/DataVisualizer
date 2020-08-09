@@ -8,7 +8,7 @@ ABOUT_CONTENT = html.Div(children= [
             html.Img(src="/assets/me.png", className="myBioPic"),
             html.Div(className="about", children=[
                 html.H2("About", className="aboutHeader"),
-                html.P("Jared graduated from Stevens Institute of Technology in 2020 with a Bachelor of Science for Computer Science in"
+                html.P("Jared graduated from Stevens Institute of Technology in 2020 with a Bachelor of Science for Computer Science in "
                        "addition to double minoring in Quantitative Finance as well as Pure & Applied Mathematics.  After graduation "
                        "Jared started his career at Goldman Sachs where he is a Software Engineer for the Consumer and Investment "
                        "Management Division.  Outside of work, Jared enjoys to work on coding side projects such as this website.  Some "
