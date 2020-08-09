@@ -60,3 +60,13 @@ def logHTML(listOfElements, funcName=""):
             for i in listOfElements:
                 f.write(i + "\n")
             f.close()
+
+def logTwitterFile(lines):
+    if not os.path.exists("tweetLog.txt"):
+        with open("tweetLog.txt", "w+") as f:
+            f.write(str(len(lines)) + "\n")
+            f.close()
+    else:
+        with open("tweetLog.txt", "a") as f:
+            f.write(str(len(lines)) + "\n")
+            f.close()
