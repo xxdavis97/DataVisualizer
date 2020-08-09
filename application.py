@@ -517,6 +517,8 @@ def optionsData(ticker):
         getData = companyStatScraper.getOptionsData(ticker)
         expiry = getData[0]
         data = getData[1]
+        from logger import logDf
+        logDf(data, "optionsData")
         header = html.H2("Options Expiring on {0}".format(expiry), className="graphHead title")
         cols = [
             {"name": ["Calls", "Last Price"], "id": "Last Price"},
