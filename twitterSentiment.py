@@ -34,7 +34,7 @@ class listener(StreamListener):
                 output.close()
         except Exception as e:
             logError(e, "Listener")
-            
+
         return True
 
     def on_error(self, status):

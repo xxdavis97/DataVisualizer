@@ -770,6 +770,8 @@ def storeSession(inputData):
 def updateSentiment(n):
     pullData = open("twitter-out.txt","r").read()
     lines = pullData.split('\n')
+    from logger import logTwitterFile
+    logTwitterFile(lines)
     xar = []
     yar = []
     x = 0
