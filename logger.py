@@ -90,3 +90,13 @@ def logTwitterError(status):
         with open("twitterError.txt", "a") as f:
             f.write(str(status) + "\n")
             f.close()
+
+def logGarbageCollect():
+    if not os.path.exists("garbageRun.txt"):
+        with open("garbageRun.txt", "w+") as f:
+            f.write("yes" + "\n")
+            f.close()
+    else:
+        with open("garbageRun.txt", "a") as f:
+            f.write("yes" + "\n")
+            f.close()

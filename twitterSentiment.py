@@ -20,11 +20,11 @@ class listener(StreamListener):
         tweet = all_data["text"]
         try:
             sentiment_value, confidence =s.sentiment(tweet)
-            logTweets(sentiment_value)
             # print(tweet, sentiment_value, confidence)
             if confidence * 100 >= 80:
                 output = open("twitter-out.txt", "a")
                 output.write(sentiment_value)
+                logTweets(sentiment_value)
                 testList += [sentiment_value]
                 # if len(testList) > 120:
                 #     testList = testList[-100:]
@@ -55,6 +55,8 @@ def garbageCollection():
         lines = lines[-3500:]
         import os
         os.remove("twitter-out.txt")
+        from logger import logGarbageCollect
+        logGarbageCollect()
         with open("twitter-out.txt", "w+") as f:
             for line in lines:
                 f.write(str(line) + "\n")
