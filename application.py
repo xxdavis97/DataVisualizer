@@ -21,7 +21,7 @@ from sentimentContent import SENTIMENT_CONTENT
 import time
 import plotly.graph_objects as go
 import twitterSentiment
-from logger import logError, logDf, logTwitterFile
+from logger import logError
 
 #################################
 # INIT DASH AND FLASK
