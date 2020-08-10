@@ -18,25 +18,23 @@ class listener(StreamListener):
         global testList
         all_data = json.loads(data)
         tweet = all_data["text"]
-        # try:
-        #     sentiment_value, confidence =s.sentiment(tweet)
-        #     logTweets(sentiment_value)
-        # except Exception as e:
-        #     logError(e, "Listener")
+        try:
+            sentiment_value, confidence =s.sentiment(tweet)
+            logTweets(sentiment_value)
+            # print(tweet, sentiment_value, confidence)
+            if confidence * 100 >= 80:
+                output = open("twitter-out.txt", "a")
+                output.write(sentiment_value)
+                testList += [sentiment_value]
+                # if len(testList) > 120:
+                #     testList = testList[-100:]
+                #     print(len(testList))
 
-        sentiment_value, confidence = s.sentiment(tweet)
-        # print(tweet, sentiment_value, confidence)
-        if confidence * 100 >= 80:
-            output = open("twitter-out.txt", "a")
-            output.write(sentiment_value)
-            testList += [sentiment_value]
-            # if len(testList) > 120:
-            #     testList = testList[-100:]
-            #     print(len(testList))
-
-            output.write('\n')
-            output.close()
-
+                output.write('\n')
+                output.close()
+        except Exception as e:
+            logError(e, "Listener")
+            
         return True
 
     def on_error(self, status):
