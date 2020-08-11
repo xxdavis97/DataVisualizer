@@ -677,3 +677,27 @@ h6 {
 .bottomRow {
   margin-bottom: 200px;
 }
+
+.optionStratDrop {
+  margin-top: 10px;
+  width: 50%;
+  margin-left: 5px;
+}
+
+.optionStratLabel {
+  margin-left: 5px;
+}
+
+.readOnlyInput {
+  background-color: #e6e6e6 !important;
+}
+
+.readOnlyDivWrap {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.optionPayoffError {
+  font-size: 20px;
+  color: red;
+}
