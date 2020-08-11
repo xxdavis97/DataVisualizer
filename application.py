@@ -18,6 +18,8 @@ from EquityVisualizerContent import EQUITY_VISUALIZER_CONTENT
 from AboutContent import ABOUT_CONTENT
 from PmContent import PM_CONTENT
 from sentimentContent import SENTIMENT_CONTENT
+from OptionPayoffContent import OPTION_PAYOFF_CONTENT
+# from CatVDogContent import CAT_V_DOG_CONTENT
 import time
 import plotly.graph_objects as go
 import twitterSentiment
@@ -72,7 +74,7 @@ for stylesheet in stylesheets:
 #################################
 # SERVE IMAGES
 #################################
-list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png', 'bannerSentiment.png']
+list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png', 'bannerSentiment.png', "bannerOptions.png"]#, "catVDog.png"]
 @app.server.route('{}<image_path>.png'.format(static_css_route))
 def serve_image(image_path):
     image_name = '{}.png'.format(image_path)
@@ -99,6 +101,10 @@ def serveWebPage(pathname):
     elif pathname == "/sentiment":
         twitterSentiment.garbageCollection()
         return SENTIMENT_CONTENT
+    elif pathname == "/optionStrategyPayoff":
+        return OPTION_PAYOFF_CONTENT
+    # elif pathname == "/catVDog":
+    #     return CAT_V_DOG_CONTENT
     else:
         return ""
 
@@ -119,6 +125,10 @@ def serveBanner(pathname):
         return "/assets/bannerPm.png"
     elif pathname == "/sentiment":
         return "/assets/bannerSentiment.png"
+    elif pathname == "/optionStrategyPayoff":
+        return "/assets/bannerOptions.png"
+    elif pathname == "/catVDog":
+        return "/assets/catVDog.png"
     else:
         return "/assets/banner404.png"
 
@@ -513,7 +523,7 @@ def topInstitutional(ticker):
         return ""
 
 #################################
-# GENERATE TOP INSTITUTIONAL OWNERSHIP TABLE
+# GENERATE OPTIONS TABLE
 #################################
 @app.callback(
     Output(component_id="options", component_property="children"),
@@ -770,8 +780,8 @@ def storeSession(inputData):
 def updateSentiment(n):
     pullData = open("twitter-out.txt","r").read()
     lines = pullData.split('\n')
-    from logger import logTwitterFile
-    logTwitterFile(lines)
+    # from logger import logTwitterFile
+    # logTwitterFile(lines)
     xar = []
     yar = []
     x = 0
@@ -799,11 +809,125 @@ def updateSentiment(n):
     fig.update_yaxes(title_text="Sentiment")
     return fig
 
+'''
+##################################################################
+# CAT V DOG SENTIMENT CALLBACKS
+##################################################################
+
+
+#################################
+# DYNAMICALLY UPDATES DOG SENTIMENT GRAPH
+#################################
+@app.callback(Output('dog-sentiment-graph', 'figure'),
+              [Input('sentiment-interval', 'n_intervals')])
+def updateDogSentiment(n):
+    pullData = open("dog-out.txt","r").read()
+    lines = pullData.split('\n')
+    xar = []
+    yar = []
+    x = 0
+    y = 0
+    for l in lines[-300:]:
+        x += 1
+        if "pos" in l:
+            y += 1
+        elif "neg" in l:
+            y -= 1
+        xar.append(x)
+        yar.append(y)
+    fig = go.Figure()
+    fig['layout']['margin'] = {
+        'l': 30, 'r': 10, 'b': 30, 't': 10
+    }
+    fig['layout']['legend'] = {'x': 0, 'y': 1, 'xanchor': 'left'}
+    fig.add_trace({
+        'x': xar,
+        'y': yar,
+        'mode': 'lines',
+        'type': 'scatter'
+    })
+    fig.update_xaxes(title_text="# Of Tweets")
+    fig.update_yaxes(title_text="Sentiment")
+    return fig
+
+#################################
+# DYNAMICALLY UPDATES CAT SENTIMENT GRAPH
+#################################
+@app.callback(Output('cat-sentiment-graph', 'figure'),
+              [Input('sentiment-interval', 'n_intervals')])
+def updateDogSentiment(n):
+    pullData = open("cat-out.txt","r").read()
+    lines = pullData.split('\n')
+    xar = []
+    yar = []
+    x = 0
+    y = 0
+    for l in lines[-300:]:
+        x += 1
+        if "pos" in l:
+            y += 1
+        elif "neg" in l:
+            y -= 1
+        xar.append(x)
+        yar.append(y)
+    fig = go.Figure()
+    fig['layout']['margin'] = {
+        'l': 30, 'r': 10, 'b': 30, 't': 10
+    }
+    fig['layout']['legend'] = {'x': 0, 'y': 1, 'xanchor': 'left'}
+    fig.add_trace({
+        'x': xar,
+        'y': yar,
+        'mode': 'lines',
+        'type': 'scatter'
+    })
+    fig.update_xaxes(title_text="# Of Tweets")
+    fig.update_yaxes(title_text="Sentiment")
+    return fig
+'''
+
+##################################################################
+# OPTION PAYOFFCALLBACKS
+##################################################################
+
+#################################
+# CREATE PAYOFF TABLE ON CLICKING OF CALCULATE BUTTON
+#################################
+#TODO: Output to the table, then have separate call backs for when the table changes to change max loss, gain and gen graph
+@app.callback(Output('optionPayoffTableWrapper', 'children'),
+              [Input('calcPayoffButton', 'n_clicks')],
+              [State('Symbolinput', 'value'), State("expiryDate", "value"), State("optionStrat", "value"),
+               State("optionType", "value"), State("percMove", "value")]
+)
+def calculateOptionPayoffTable(n_clicks, ticker, expiry, strategy, type, percMove):
+    if n_clicks is not None and n_clicks > 0:
+        try:
+            _, df = companyStatScraper.getOptionsData(ticker, expiry)
+            price = float(companyStatScraper.getCurrMarketPrice([ticker])[0][0])
+            percMove = float(percMove) / 100
+            minusStrike = (1 - percMove) * price
+            plusStrike = (1 + percMove) * price
+            if type == "call":
+                df = df[['Last Price', 'Strike']]
+            else:
+                df = df[['Last Price.1', 'Strike']]
+                df.rename(columns={"Last Price.1": "Last Price"}, inplace=True)
+            strikeList = df['Strike'].values.tolist()
+            lowStrike = companyStatScraper.findStrike(strikeList, minusStrike)
+            lowStrikePrem = df[df["Strike"] == lowStrike]['Last Price'].values[0]
+            highStrike = companyStatScraper.findStrike(strikeList, plusStrike)
+            highStrikePrem = df[df["Strike"] == highStrike]['Last Price'].values[0]
+            # TODO: In table highlight the rows with the strike prices in a color and highlight the max loss and gain in colors
+        except:
+            return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
+                   "underlier expiring on the date you selected", className="optionPayoffError")
+    return ""#df.to_dict('records')
+
 ##################################################################
 # RUN APPLICATION
 ##################################################################
 if __name__ == '__main__':
     # For deployment
-    application.run(debug=True, host='0.0.0.0', port='80')
+    # application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    # application.run(debug=False)
+    application.run(debug=False)

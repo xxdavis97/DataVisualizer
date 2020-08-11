@@ -159,7 +159,7 @@ def getFundOwnership(ticker):
         # return [instFrame, mutualFrame]
         return [instFrame]
 
-def getOptionsData(ticker):
+def getOptionsData(ticker, date=None):
     global toPickle
     global usePickle
     if usePickle:
@@ -168,7 +168,11 @@ def getOptionsData(ticker):
             f.close()
             return pick
     else:
-        url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker)
+        if date is None:
+            url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker)
+        else:
+            date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d") - timedelta(hours=4)).timetuple()))
+            url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date)
         site = re.get(url)
         soup = BeautifulSoup(site.content)
         expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
@@ -293,3 +297,17 @@ def getSharpeRatio(ret, std):
 def getTreynorRatio(ret, beta):
     riskfree = float(getRiskFreeRate()) / 100
     return round((float(ret[0]) - riskfree) / float(beta[0]), 2)
+
+def findStrike(myList, myNumber):
+    from bisect import bisect_left
+    pos = bisect_left(myList, myNumber)
+    if pos == 0:
+        return myList[0]
+    if pos == len(myList):
+        return myList[-1]
+    before = myList[pos - 1]
+    after = myList[pos]
+    if after - myNumber < myNumber - before:
+       return after
+    else:
+       return before

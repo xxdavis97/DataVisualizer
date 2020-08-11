@@ -11,29 +11,20 @@ consumer_secret = "H2tH8OLcb7j5tjFrRJNTyxZilzgoKE2OlQzaXfGeyYm1LMvdEc"
 access_token = "1044066351638286336-Mvif5sOzBnS2JEDjaoByH8rlvAKMaX"
 access_secret = "Aw4QERisoqoj2kIAIrCugfObDUPyHp1DTPUxr1kzWeDSl"
 
-testList = []
-
-class listener(StreamListener):
+class dogListener(StreamListener):
     def on_data(self, data):
         global testList
         all_data = json.loads(data)
         tweet = all_data["text"]
         try:
             sentiment_value, confidence =s.sentiment(tweet)
-            # print(tweet, sentiment_value, confidence)
             if confidence * 100 >= 80:
-                output = open("twitter-out.txt", "a")
+                output = open("dog-out.txt", "a")
                 output.write(sentiment_value)
-                # logTweets(sentiment_value)
-                testList += [sentiment_value]
-                # if len(testList) > 120:
-                #     testList = testList[-100:]
-                #     print(len(testList))
-
                 output.write('\n')
                 output.close()
         except Exception as e:
-            logError(e, "Listener")
+            logError(e, "DogListener")
 
         return True
 
@@ -41,26 +32,39 @@ class listener(StreamListener):
         logTwitterError(status)
         print(status)
 
-def runStream():
+class catListener(StreamListener):
+    def on_data(self, data):
+        global testList
+        all_data = json.loads(data)
+        tweet = all_data["text"]
+        try:
+            sentiment_value, confidence = s.sentiment(tweet)
+            if confidence * 100 >= 80:
+                output = open("cat-out.txt", "a")
+                output.write(sentiment_value)
+                output.write('\n')
+                output.close()
+        except Exception as e:
+            logError(e, "CatListener")
+
+        return True
+
+    def on_error(self, status):
+        logTwitterError(status)
+        print(status)
+
+def runDogStream():
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_secret)
-    twitterStream = Stream(auth, listener())
-    twitterStream.filter(track=["S&P 500", "S&P", "Dow", "Dow Jones", "DJI", "Standard And Poors", "NASDAQ", "FANG",
-                                "QQQ", "Stock", "Federal Reserve", "Interest Rates", "Futures", "The Fed", "Bonds", "Treasury"], is_async=True)
+    twitterStream = Stream(auth, dogListener())
+    twitterStream.filter(track=["Dog", "Puppy"], is_async=True)
 
-def garbageCollection():
-    pullData = open("twitter-out.txt", "r").read()
-    lines = pullData.split('\n')
-    if len(lines) > 4000:
-        lines = lines[-3500:]
-        import os
-        os.remove("twitter-out.txt")
-        # from logger import logGarbageCollect
-        # logGarbageCollect()
-        with open("twitter-out.txt", "w+") as f:
-            for line in lines:
-                f.write(str(line) + "\n")
-            f.close()
+def runCatStream():
+    auth = OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_secret)
+    twitterStream = Stream(auth, catListener())
+    twitterStream.filter(track=["Cat", "Kitten"], is_async=True)
+
 
 # Economy, markets, SPY
 # TODO: Make sure tweet is in english
