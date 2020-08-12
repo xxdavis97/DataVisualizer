@@ -896,13 +896,16 @@ def updateDogSentiment(n):
 #TODO: Output to the table, then have separate call backs for when the table changes to change max loss, gain and gen graph
 @app.callback(Output('optionPayoffTableWrapper', 'children'),
               [Input('calcPayoffButton', 'n_clicks')],
-              [State('Symbolinput', 'value'), State("expiryDate", "value"), State("optionStrat", "value"),
+              [State('Symbolinput', 'value'), State("expiryDate", "value"), State("numContract", "value"), State("optionStrat", "value"),
                State("optionType", "value"), State("percMove", "value")]
 )
-def calculateOptionPayoffTable(n_clicks, ticker, expiry, strategy, type, percMove):
+def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy, type, percMove):
     if n_clicks is not None and n_clicks > 0:
         try:
             _, df = companyStatScraper.getOptionsData(ticker, expiry)
+            df.replace("-", np.nan, inplace=True)
+            df.dropna(inplace=True, how="any")
+            numContracts = int(numContracts)
             price = float(companyStatScraper.getCurrMarketPrice([ticker])[0][0])
             percMove = float(percMove) / 100
             minusStrike = (1 - percMove) * price
@@ -914,9 +917,40 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, strategy, type, percMov
                 df.rename(columns={"Last Price.1": "Last Price"}, inplace=True)
             strikeList = df['Strike'].values.tolist()
             lowStrike = companyStatScraper.findStrike(strikeList, minusStrike)
-            lowStrikePrem = df[df["Strike"] == lowStrike]['Last Price'].values[0]
+            lowStrikePrem = float(df[df["Strike"] == lowStrike]['Last Price'].values[0])
             highStrike = companyStatScraper.findStrike(strikeList, plusStrike)
-            highStrikePrem = df[df["Strike"] == highStrike]['Last Price'].values[0]
+            highStrikePrem = float(df[df["Strike"] == highStrike]['Last Price'].values[0])
+            # This states how much to go up or down on the underlier, don't want to be going up and down by 1 on a 3 dollar stock
+            iter = 1
+            if price - lowStrike <= 5:
+                iter = .25
+            elif price - lowStrike <= 10:
+                iter = .5
+            bottomBound = price - (iter*25)
+            topBound = price + (iter*25)
+            underlierFlux = []
+            for i in range(int(bottomBound), int(topBound)+1):
+                underlierFlux += [i]
+
+            if strategy == "bull" and type == "call":
+                shortCall = []
+                longCall = []
+                net = []
+                for i in underlierFlux:
+                    if i <= highStrike:
+                        shortCall += [highStrikePrem*100*numContracts]
+                    else:
+                        shortCall += [(highStrikePrem - (i - highStrike))*100*numContracts]
+
+                    if i <= lowStrike:
+                        longCall += [lowStrikePrem*(-1)*100*numContracts]
+                    else:
+                        longCall += [((lowStrikePrem*-1) + (i - lowStrike))*100*numContracts]
+                for i in range(len(shortCall)):
+                    net += [longCall[i]+shortCall[i]]
+                maxLoss = min(net)
+                maxGain = max(net)
+
             # TODO: In table highlight the rows with the strike prices in a color and highlight the max loss and gain in colors
         except:
             return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
