@@ -893,7 +893,6 @@ def updateDogSentiment(n):
 #################################
 # CREATE PAYOFF TABLE ON CLICKING OF CALCULATE BUTTON
 #################################
-#TODO: Output to the table, then have separate call backs for when the table changes to change max loss, gain and gen graph
 @app.callback(Output('optionPayoffTableWrapper', 'children'),
               [Input('calcPayoffButton', 'n_clicks')],
               [State('Symbolinput', 'value'), State("expiryDate", "value"), State("numContract", "value"), State("optionStrat", "value"),
@@ -926,8 +925,8 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 iter = .25
             elif price - lowStrike <= 10:
                 iter = .5
-            bottomBound = price - (iter*25)
-            topBound = price + (iter*25)
+            bottomBound = price - (iter*30)
+            topBound = price + (iter*30)
             underlierFlux = []
             for i in range(int(bottomBound), int(topBound)+1):
                 underlierFlux += [i]
@@ -938,24 +937,62 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 net = []
                 for i in underlierFlux:
                     if i <= highStrike:
-                        shortCall += [highStrikePrem*100*numContracts]
+                        shortCall += [round(highStrikePrem*100*numContracts, 2)]
                     else:
-                        shortCall += [(highStrikePrem - (i - highStrike))*100*numContracts]
+                        shortCall += [round((highStrikePrem - (i - highStrike))*100*numContracts, 2)]
 
                     if i <= lowStrike:
-                        longCall += [lowStrikePrem*(-1)*100*numContracts]
+                        longCall += [round(lowStrikePrem*(-1)*100*numContracts, 2)]
                     else:
-                        longCall += [((lowStrikePrem*-1) + (i - lowStrike))*100*numContracts]
+                        longCall += [round(((lowStrikePrem*-1) + (i - lowStrike))*100*numContracts, 2)]
                 for i in range(len(shortCall)):
                     net += [longCall[i]+shortCall[i]]
-                maxLoss = min(net)
-                maxGain = max(net)
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall, "Net Payoff": net})
+                return dash_table.DataTable(
+                    id='payoffTable',
+                    columns=[{"name": i, "id": i} for i in payoffDf.columns],
+                    data=payoffDf.to_dict('records'),
+                    fixed_rows={'headers': True},
+                    style_data_conditional=[
+                        {
+                            'if': {'row_index': 'even'},
+                            'backgroundColor': '#3399ff'
+                        }
+                    ],
+                    style_data={
+                        'whiteSpace': 'normal',
+                        'height': 'auto',
+                        'lineHeight': '15px'
+                    },
+                    style_cell={'textAlign': 'center'},
+                    css=[{"selector": ".dash-spreadsheet",
+                          "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
+                )
 
-            # TODO: In table highlight the rows with the strike prices in a color and highlight the max loss and gain in colors
+            # TODO: In table highlight the rows with the strike prices in a color
         except:
             return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
                    "underlier expiring on the date you selected", className="optionPayoffError")
     return ""#df.to_dict('records')
+
+#################################
+# CREATE MAX AND LOSS AND GAIN ON TABLE CHANGE
+#################################
+@app.callback(Output('maxGainLossRow', 'children'),
+              [Input('optionPayoffTableWrapper', 'children')]
+)
+def showMaxGainLoss(children):
+    net = pd.DataFrame.from_records(children['props']['data'])['Net Payoff'].values.tolist()
+    minP = min(net)
+    maxP = max(net)
+    return [html.Div(className="six columns readOnlyDivWrap", children=[
+        html.Label(className="optionStratLabel", htmlFor="maxLoss", children="Maximum Loss: "),
+        dcc.Input(id="maxLoss", className="readOnlyInput", value=minP, type="text", readOnly=True)
+    ]),
+    html.Div(className="six columns readOnlyDivWrap", children=[
+        html.Label(className="optionStratLabel", htmlFor="maxGain", children="Maximum Gain  : "),
+        dcc.Input(id="maxGain", className="readOnlyInput", value=maxP, type="text", readOnly=True)
+    ])]
 
 ##################################################################
 # RUN APPLICATION

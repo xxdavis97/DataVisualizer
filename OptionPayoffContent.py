@@ -49,19 +49,8 @@ OPTION_PAYOFF_CONTENT = html.Div(children= [
                 html.Button("Calculate", id="calcPayoffButton", className="btn-submit")
             ]),
         ]),
+        html.Div(id ="maxGainLossRow", className="row aboutRow"),
         html.Div(className="row aboutRow", children=[
-            # TODO: Programmatically fill in max loss and max gain also only show these after you hit submit
-            html.Div(className="six columns readOnlyDivWrap", children=[
-                html.Label(className="optionStratLabel", htmlFor="maxLoss", children="Maximum Loss: "),
-                dcc.Input(id="maxLoss", className="readOnlyInput", value="", type="text", readOnly=True)
-            ]),
-            html.Div(className="six columns readOnlyDivWrap", children=[
-                html.Label(className="optionStratLabel", htmlFor="maxGain", children="Maximum Gain  : "),
-                dcc.Input(id="maxGain", className="readOnlyInput", value="", type="text", readOnly=True)
-            ])
-        ]),
-        html.Div(className="row aboutRow", children=[
-            # TODO: Programmatically fill in table like i do in excel
             html.Div(id="optionPayoffTableWrapper")
         ]),
         html.Div(className="row aboutRow", children=[
