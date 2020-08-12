@@ -690,6 +690,7 @@ h6 {
 
 .readOnlyInput {
   background-color: #e6e6e6 !important;
+  margin-bottom: 30px !important;
 }
 
 .readOnlyDivWrap {
@@ -700,4 +701,9 @@ h6 {
 .optionPayoffError {
   font-size: 20px;
   color: red;
+}
+
+#payoffTable {
+  /*overflow-y: auto;*/
+  max-height: 350px !important;
 }
