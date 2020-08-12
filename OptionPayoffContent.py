@@ -29,6 +29,7 @@ OPTION_PAYOFF_CONTENT = html.Div(children= [
                     options=[
                         {'label': 'Bull Spread', 'value': 'bull'},
                         {'label': 'Bear Spread', 'value': 'bear'},
+                        {'label': 'Butterfly Spread', 'value': 'butterfly'}
                     ],
                     id='optionStrat',
                     searchable=False,

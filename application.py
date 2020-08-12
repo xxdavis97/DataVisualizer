@@ -930,7 +930,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
             underlierFlux = []
             for i in range(int(bottomBound), int(topBound)+1):
                 underlierFlux += [i]
-
+            payoffDf = None
             if strategy == "bull" and type == "call":
                 shortCall = []
                 longCall = []
@@ -939,41 +939,91 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                     if i <= highStrike:
                         shortCall += [round(highStrikePrem*100*numContracts, 2)]
                     else:
-                        shortCall += [round((highStrikePrem - (i - highStrike))*100*numContracts, 2)]
+                        shortCall += [round((highStrikePrem - abs((i - highStrike)))*100*numContracts, 2)]
 
                     if i <= lowStrike:
                         longCall += [round(lowStrikePrem*(-1)*100*numContracts, 2)]
                     else:
-                        longCall += [round(((lowStrikePrem*-1) + (i - lowStrike))*100*numContracts, 2)]
+                        longCall += [round(((lowStrikePrem*-1) + abs((i - lowStrike)))*100*numContracts, 2)]
                 for i in range(len(shortCall)):
                     net += [longCall[i]+shortCall[i]]
                 payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall, "Net Payoff": net})
-                return dash_table.DataTable(
-                    id='payoffTable',
-                    columns=[{"name": i, "id": i} for i in payoffDf.columns],
-                    data=payoffDf.to_dict('records'),
-                    fixed_rows={'headers': True},
-                    style_data_conditional=[
-                        {
-                            'if': {'row_index': 'even'},
-                            'backgroundColor': '#3399ff'
-                        }
-                    ],
-                    style_data={
-                        'whiteSpace': 'normal',
-                        'height': 'auto',
-                        'lineHeight': '15px'
-                    },
-                    style_cell={'textAlign': 'center'},
-                    css=[{"selector": ".dash-spreadsheet",
-                          "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
-                )
 
+            elif strategy == "bull" and type == "put":
+                shortPut = []
+                longPut = []
+                net = []
+                for i in underlierFlux:
+                    if i >= highStrike:
+                        shortPut += [round(highStrikePrem*100*numContracts, 2)]
+                    else:
+                        shortPut += [round((highStrikePrem - abs((i - highStrike)))*100*numContracts, 2)]
+                    if i >= lowStrike:
+                        longPut += [round(lowStrikePrem * (-1) * 100 * numContracts, 2)]
+                    else:
+                        longPut += [round(((lowStrikePrem*-1) + abs((i - lowStrike)))*100*numContracts, 2)]
+                for i in range(len(shortPut)):
+                    net += [longPut[i]+shortPut[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Put Position": shortPut, "Long Put Position": longPut, "Net Payoff": net})
+
+            elif strategy == "bear" and type == "put":
+                shortPut = []
+                longPut = []
+                net = []
+                for i in underlierFlux:
+                    if i >= highStrike:
+                        longPut += [round(highStrikePrem * (-1) * 100 * numContracts, 2)]
+                    else:
+                        longPut += [round(((highStrikePrem * -1) + abs((i - highStrike))) * 100 * numContracts, 2)]
+                    if i >= lowStrike:
+                        shortPut += [round(lowStrikePrem * 100 * numContracts, 2)]
+                    else:
+                        shortPut += [round(((lowStrikePrem) - abs((i - lowStrike)))*100*numContracts, 2)]
+                for i in range(len(shortPut)):
+                    net += [longPut[i] + shortPut[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Put Position": shortPut, "Long Put Position": longPut,"Net Payoff": net})
+
+            elif strategy == "bear" and type == "call":
+                shortCall = []
+                longCall = []
+                net = []
+                for i in underlierFlux:
+                    if i <= lowStrike:
+                        shortCall += [round(lowStrikePrem * 100 * numContracts, 2)]
+                    else:
+                        shortCall += [round(((lowStrikePrem) - abs((i - lowStrike)))*100*numContracts, 2)]
+                    if i <= highStrike:
+                        longCall += [round(highStrikePrem * (-1) * 100 * numContracts, 2)]
+                    else:
+                        longCall += [round(((highStrikePrem * -1) + abs((i - highStrike))) * 100 * numContracts, 2)]
+                for i in range(len(shortCall)):
+                    net += [longCall[i] + shortCall[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall,"Net Payoff": net})
+
+            return dash_table.DataTable(
+                id='payoffTable',
+                columns=[{"name": i, "id": i} for i in payoffDf.columns],
+                data=payoffDf.to_dict('records'),
+                fixed_rows={'headers': True},
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'even'},
+                        'backgroundColor': '#3399ff'
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
+                },
+                style_cell={'textAlign': 'center'},
+                css=[{"selector": ".dash-spreadsheet",
+                      "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
+            ) if payoffDf is not None else ""
             # TODO: In table highlight the rows with the strike prices in a color
         except:
             return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
                    "underlier expiring on the date you selected", className="optionPayoffError")
-    return ""#df.to_dict('records')
 
 #################################
 # CREATE MAX AND LOSS AND GAIN ON TABLE CHANGE
@@ -999,6 +1049,6 @@ def showMaxGainLoss(children):
 ##################################################################
 if __name__ == '__main__':
     # For deployment
-    application.run(debug=True, host='0.0.0.0', port='80')
+    # application.run(debug=True, host='0.0.0.0', port='80')
     # For local
-    # application.run(debug=False)
+    application.run(debug=False)
