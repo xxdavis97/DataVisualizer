@@ -182,7 +182,10 @@ def getOptionsData(ticker, date=None):
         # cycleThree = ["March", "June", "September", "December"]
         # optionTable = soup.find("table")
         # headerRow = optionTable.find_all("th")
-        optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker))[0]
+        if date is None:
+            optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker))[0]
+        else:
+            optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date))[0]
         optionFrame.drop(["Change", "% Change", "Change.1", "% Change.1", "Volume", "Volume.1"], inplace=True, axis=1)
         if toPickle:
             if not os.path.exists("backupData/{0}".format(ticker)):
