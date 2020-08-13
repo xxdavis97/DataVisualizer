@@ -168,14 +168,12 @@ def getOptionsData(ticker, date=None):
             f.close()
             return pick
     else:
+        expiry = None
         if date is None:
             url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker)
-        else:
-            date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d") - timedelta(hours=4)).timetuple()))
-            url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date)
-        site = re.get(url)
-        soup = BeautifulSoup(site.content)
-        expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
+            site = re.get(url)
+            soup = BeautifulSoup(site.content)
+            expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
         # TODO: Pick option expiry https://stackoverflow.com/questions/28680896/how-can-i-get-the-3rd-friday-of-a-month-in-python
         # cycleOne = ["January", "April", "July", "October"]
         # cycleTwo = ["February", "May", "August", "November"]
