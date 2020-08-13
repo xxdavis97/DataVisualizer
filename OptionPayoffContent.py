@@ -13,6 +13,9 @@ OPTION_PAYOFF_CONTENT = html.Div(children= [
                    "then inputting a 5% move will assign your short put position a strike price of $95 and your long put position a strike price of $105."
                    " This application will provide a data table, coupled with a a graph, of how much you make or lose based on the level of the underlier at expiry "
                    "as well as maximum potential gain and loss. "),
+            html.Strong(
+                "*Note* This table and chart are very good approximations but not exact (a strike of 52.50 will show an underlier of 52 and 53 having the same payoff.  This is only a minute error, "
+                "but it is worth noting.")
         ]),
         html.Div(className="row aboutRow optionPayoffInputRow", children=[
             html.Div(className="six columns", children=[

@@ -187,8 +187,6 @@ def getOptionsData(ticker, date=None):
             # date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d") - timedelta(hours=4)).timetuple()))
             # For deployment
             date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d")).timetuple()))
-            from logger import logError
-            logError("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date), "This is the link")
             optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date))[0]
         optionFrame.drop(["Change", "% Change", "Change.1", "% Change.1", "Volume", "Volume.1"], inplace=True, axis=1)
         if toPickle:
