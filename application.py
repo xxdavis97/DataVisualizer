@@ -1031,7 +1031,8 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                       "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
             ) if payoffDf is not None else ""
             # TODO: In table highlight the rows with the strike prices in a color
-        except:
+        except Exception as e:
+            logError(e, "Option Payoff Table")
             return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
                    "underlier expiring on the date you selected", className="optionPayoffError")
 
