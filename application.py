@@ -903,6 +903,8 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
     if n_clicks is not None and n_clicks > 0:
         try:
             _, df = companyStatScraper.getOptionsData(ticker, expiry)
+            from logger import logDf
+            logDf(df, "Option Payoff Table Df")
             df.replace("-", np.nan, inplace=True)
             df.dropna(inplace=True, how="any")
             numContracts = int(numContracts)
