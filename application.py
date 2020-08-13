@@ -901,143 +901,143 @@ def updateDogSentiment(n):
 )
 def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy, type, percMove):
     if n_clicks is not None and n_clicks > 0:
-        # try:
-        _, df = companyStatScraper.getOptionsData(ticker, expiry)
-        from logger import logDf
-        logDf(df, "Option Payoff Table Df")
-        df.replace("-", np.nan, inplace=True)
-        df.dropna(inplace=True, how="any")
-        numContracts = int(numContracts)
-        price = float(companyStatScraper.getCurrMarketPrice([ticker])[0][0])
-        percMove = float(percMove) / 100
-        minusStrike = (1 - percMove) * price
-        plusStrike = (1 + percMove) * price
-        # Shorten the df for bull/bear spreads but need the whole df if straddle or strangle
-        if type == "call":
-            df = df[['Last Price', 'Strike']]
-        elif type == "put":
-            df = df[['Last Price.1', 'Strike']]
-            df.rename(columns={"Last Price.1": "Last Price"}, inplace=True)
-        strikeList = df['Strike'].values.tolist()
-        lowStrike = companyStatScraper.findStrike(strikeList, minusStrike)
-        lowStrikePrem = float(df[df["Strike"] == lowStrike]['Last Price'].values[0])
-        highStrike = companyStatScraper.findStrike(strikeList, plusStrike)
-        highStrikePrem = float(df[df["Strike"] == highStrike]['Last Price'].values[0])
-        # This states how much to go up or down on the underlier, don't want to be going up and down by 1 on a 3 dollar stock
-        iter = 1
-        if price - lowStrike <= 5:
-            iter = .25
-        elif price - lowStrike <= 10:
-            iter = .5
-        bottomBound = price - (iter*30)
-        topBound = price + (iter*30)
-        underlierFlux = []
-        # TODO: Make underlier go up by iter and not by 1
-        for i in range(int(bottomBound), int(topBound)+1):
-            underlierFlux += [i]
-        payoffDf = None
-        if strategy == "bull" and type == "call":
-            shortCall = []
-            longCall = []
-            net = []
-            for i in underlierFlux:
-                if i <= highStrike:
-                    shortCall += [round(highStrikePrem*100*numContracts, 2)]
-                else:
-                    shortCall += [round((highStrikePrem - abs((i - highStrike)))*100*numContracts, 2)]
+        try:
+            _, df = companyStatScraper.getOptionsData(ticker, expiry)
+            from logger import logDf
+            logDf(df, "Option Payoff Table Df")
+            df.replace("-", np.nan, inplace=True)
+            df.dropna(inplace=True, how="any")
+            numContracts = int(numContracts)
+            price = float(companyStatScraper.getCurrMarketPrice([ticker])[0][0])
+            percMove = float(percMove) / 100
+            minusStrike = (1 - percMove) * price
+            plusStrike = (1 + percMove) * price
+            # Shorten the df for bull/bear spreads but need the whole df if straddle or strangle
+            if type == "call":
+                df = df[['Last Price', 'Strike']]
+            elif type == "put":
+                df = df[['Last Price.1', 'Strike']]
+                df.rename(columns={"Last Price.1": "Last Price"}, inplace=True)
+            strikeList = df['Strike'].values.tolist()
+            lowStrike = companyStatScraper.findStrike(strikeList, minusStrike)
+            lowStrikePrem = float(df[df["Strike"] == lowStrike]['Last Price'].values[0])
+            highStrike = companyStatScraper.findStrike(strikeList, plusStrike)
+            highStrikePrem = float(df[df["Strike"] == highStrike]['Last Price'].values[0])
+            # This states how much to go up or down on the underlier, don't want to be going up and down by 1 on a 3 dollar stock
+            iter = 1
+            if price - lowStrike <= 5:
+                iter = .25
+            elif price - lowStrike <= 10:
+                iter = .5
+            bottomBound = price - (iter*30)
+            topBound = price + (iter*30)
+            underlierFlux = []
+            # TODO: Make underlier go up by iter and not by 1
+            for i in range(int(bottomBound), int(topBound)+1):
+                underlierFlux += [i]
+            payoffDf = None
+            if strategy == "bull" and type == "call":
+                shortCall = []
+                longCall = []
+                net = []
+                for i in underlierFlux:
+                    if i <= highStrike:
+                        shortCall += [round(highStrikePrem*100*numContracts, 2)]
+                    else:
+                        shortCall += [round((highStrikePrem - abs((i - highStrike)))*100*numContracts, 2)]
 
-                if i <= lowStrike:
-                    longCall += [round(lowStrikePrem*(-1)*100*numContracts, 2)]
-                else:
-                    longCall += [round(((lowStrikePrem*-1) + abs((i - lowStrike)))*100*numContracts, 2)]
-            for i in range(len(shortCall)):
-                net += [longCall[i]+shortCall[i]]
-            payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall, "Net Payoff": net})
+                    if i <= lowStrike:
+                        longCall += [round(lowStrikePrem*(-1)*100*numContracts, 2)]
+                    else:
+                        longCall += [round(((lowStrikePrem*-1) + abs((i - lowStrike)))*100*numContracts, 2)]
+                for i in range(len(shortCall)):
+                    net += [longCall[i]+shortCall[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall, "Net Payoff": net})
 
-        elif strategy == "bull" and type == "put":
-            shortPut = []
-            longPut = []
-            net = []
-            for i in underlierFlux:
-                if i >= highStrike:
-                    shortPut += [round(highStrikePrem*100*numContracts, 2)]
-                else:
-                    shortPut += [round((highStrikePrem - abs((i - highStrike)))*100*numContracts, 2)]
-                if i >= lowStrike:
-                    longPut += [round(lowStrikePrem * (-1) * 100 * numContracts, 2)]
-                else:
-                    longPut += [round(((lowStrikePrem*-1) + abs((i - lowStrike)))*100*numContracts, 2)]
-            for i in range(len(shortPut)):
-                net += [longPut[i]+shortPut[i]]
-            payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Put Position": shortPut, "Long Put Position": longPut, "Net Payoff": net})
+            elif strategy == "bull" and type == "put":
+                shortPut = []
+                longPut = []
+                net = []
+                for i in underlierFlux:
+                    if i >= highStrike:
+                        shortPut += [round(highStrikePrem*100*numContracts, 2)]
+                    else:
+                        shortPut += [round((highStrikePrem - abs((i - highStrike)))*100*numContracts, 2)]
+                    if i >= lowStrike:
+                        longPut += [round(lowStrikePrem * (-1) * 100 * numContracts, 2)]
+                    else:
+                        longPut += [round(((lowStrikePrem*-1) + abs((i - lowStrike)))*100*numContracts, 2)]
+                for i in range(len(shortPut)):
+                    net += [longPut[i]+shortPut[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Put Position": shortPut, "Long Put Position": longPut, "Net Payoff": net})
 
-        elif strategy == "bear" and type == "put":
-            shortPut = []
-            longPut = []
-            net = []
-            for i in underlierFlux:
-                if i >= highStrike:
-                    longPut += [round(highStrikePrem * (-1) * 100 * numContracts, 2)]
-                else:
-                    longPut += [round(((highStrikePrem * -1) + abs((i - highStrike))) * 100 * numContracts, 2)]
-                if i >= lowStrike:
-                    shortPut += [round(lowStrikePrem * 100 * numContracts, 2)]
-                else:
-                    shortPut += [round(((lowStrikePrem) - abs((i - lowStrike)))*100*numContracts, 2)]
-            for i in range(len(shortPut)):
-                net += [longPut[i] + shortPut[i]]
-            payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Put Position": shortPut, "Long Put Position": longPut,"Net Payoff": net})
+            elif strategy == "bear" and type == "put":
+                shortPut = []
+                longPut = []
+                net = []
+                for i in underlierFlux:
+                    if i >= highStrike:
+                        longPut += [round(highStrikePrem * (-1) * 100 * numContracts, 2)]
+                    else:
+                        longPut += [round(((highStrikePrem * -1) + abs((i - highStrike))) * 100 * numContracts, 2)]
+                    if i >= lowStrike:
+                        shortPut += [round(lowStrikePrem * 100 * numContracts, 2)]
+                    else:
+                        shortPut += [round(((lowStrikePrem) - abs((i - lowStrike)))*100*numContracts, 2)]
+                for i in range(len(shortPut)):
+                    net += [longPut[i] + shortPut[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Put Position": shortPut, "Long Put Position": longPut,"Net Payoff": net})
 
-        elif strategy == "bear" and type == "call":
-            shortCall = []
-            longCall = []
-            net = []
-            for i in underlierFlux:
-                if i <= lowStrike:
-                    shortCall += [round(lowStrikePrem * 100 * numContracts, 2)]
-                else:
-                    shortCall += [round(((lowStrikePrem) - abs((i - lowStrike)))*100*numContracts, 2)]
-                if i <= highStrike:
-                    longCall += [round(highStrikePrem * (-1) * 100 * numContracts, 2)]
-                else:
-                    longCall += [round(((highStrikePrem * -1) + abs((i - highStrike))) * 100 * numContracts, 2)]
-            for i in range(len(shortCall)):
-                net += [longCall[i] + shortCall[i]]
-            payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall,"Net Payoff": net})
-        # lowStrikeToColor = companyStatScraper.findStrike(underlierFlux, lowStrike)
-        # highStrikeToColor = companyStatScraper.findStrike(underlierFlux, highStrike)
-        return dash_table.DataTable(
-            id='payoffTable',
-            columns=[{"name": i, "id": i} for i in payoffDf.columns],
-            data=payoffDf.to_dict('records'),
-            fixed_rows={'headers': True},
-            style_data_conditional=[
-                {
-                    'if': {'row_index': 'even'},
-                    'backgroundColor': '#99ccff'
+            elif strategy == "bear" and type == "call":
+                shortCall = []
+                longCall = []
+                net = []
+                for i in underlierFlux:
+                    if i <= lowStrike:
+                        shortCall += [round(lowStrikePrem * 100 * numContracts, 2)]
+                    else:
+                        shortCall += [round(((lowStrikePrem) - abs((i - lowStrike)))*100*numContracts, 2)]
+                    if i <= highStrike:
+                        longCall += [round(highStrikePrem * (-1) * 100 * numContracts, 2)]
+                    else:
+                        longCall += [round(((highStrikePrem * -1) + abs((i - highStrike))) * 100 * numContracts, 2)]
+                for i in range(len(shortCall)):
+                    net += [longCall[i] + shortCall[i]]
+                payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall,"Net Payoff": net})
+            # lowStrikeToColor = companyStatScraper.findStrike(underlierFlux, lowStrike)
+            # highStrikeToColor = companyStatScraper.findStrike(underlierFlux, highStrike)
+            return dash_table.DataTable(
+                id='payoffTable',
+                columns=[{"name": i, "id": i} for i in payoffDf.columns],
+                data=payoffDf.to_dict('records'),
+                fixed_rows={'headers': True},
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'even'},
+                        'backgroundColor': '#99ccff'
+                    },
+                    # {
+                    #     'if': {
+                    #         'filter_query': '{{Underlier}} == {0} | {{Underlier}} == {1}'.format(lowStrike, highStrike),
+                    #         'column_id': 'Underlier'
+                    #     },
+                    #     'backgroundColor': '#ff9999',
+                    # },
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
                 },
-                # {
-                #     'if': {
-                #         'filter_query': '{{Underlier}} == {0} | {{Underlier}} == {1}'.format(lowStrike, highStrike),
-                #         'column_id': 'Underlier'
-                #     },
-                #     'backgroundColor': '#ff9999',
-                # },
-            ],
-            style_data={
-                'whiteSpace': 'normal',
-                'height': 'auto',
-                'lineHeight': '15px'
-            },
-            style_cell={'textAlign': 'center'},
-            css=[{"selector": ".dash-spreadsheet",
-                  "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
-        ) if payoffDf is not None else ""
+                style_cell={'textAlign': 'center'},
+                css=[{"selector": ".dash-spreadsheet",
+                      "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
+            ) if payoffDf is not None else ""
             # TODO: In table highlight the rows with the strike prices in a color
-        # except Exception as e:
-        #     logError(e, "Option Payoff Table")
-        #     return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
-        #            "underlier expiring on the date you selected", className="optionPayoffError")
+        except Exception as e:
+            logError(e, "Option Payoff Table")
+            return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
+                   "underlier expiring on the date you selected", className="optionPayoffError")
 
 #################################
 # CREATE MAX AND LOSS AND GAIN ON TABLE CHANGE
