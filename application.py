@@ -44,6 +44,7 @@ app.layout = html.Div(children= [
         html.Ul(children=[
             dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
             dcc.Link(html.Li("Portfolio Manager"), href="/pm", className="borderLi", refresh=True),
+            dcc.Link(html.Li("Option Strategy Payoffs"), href="/optionStrategyPayoff", className="borderLi", refresh=True),
             dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
@@ -928,6 +929,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
             bottomBound = price - (iter*30)
             topBound = price + (iter*30)
             underlierFlux = []
+            # TODO: Make underlier go up by iter and not by 1
             for i in range(int(bottomBound), int(topBound)+1):
                 underlierFlux += [i]
             payoffDf = None
@@ -999,7 +1001,8 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 for i in range(len(shortCall)):
                     net += [longCall[i] + shortCall[i]]
                 payoffDf = pd.DataFrame({"Underlier": underlierFlux, "Short Call Position": shortCall, "Long Call Position": longCall,"Net Payoff": net})
-
+            # lowStrikeToColor = companyStatScraper.findStrike(underlierFlux, lowStrike)
+            # highStrikeToColor = companyStatScraper.findStrike(underlierFlux, highStrike)
             return dash_table.DataTable(
                 id='payoffTable',
                 columns=[{"name": i, "id": i} for i in payoffDf.columns],
@@ -1008,8 +1011,15 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 style_data_conditional=[
                     {
                         'if': {'row_index': 'even'},
-                        'backgroundColor': '#3399ff'
-                    }
+                        'backgroundColor': '#99ccff'
+                    },
+                    # {
+                    #     'if': {
+                    #         'filter_query': '{{Underlier}} == {0} | {{Underlier}} == {1}'.format(lowStrike, highStrike),
+                    #         'column_id': 'Underlier'
+                    #     },
+                    #     'backgroundColor': '#ff9999',
+                    # },
                 ],
                 style_data={
                     'whiteSpace': 'normal',
@@ -1043,6 +1053,26 @@ def showMaxGainLoss(children):
         html.Label(className="optionStratLabel", htmlFor="maxGain", children="Maximum Gain  : "),
         dcc.Input(id="maxGain", className="readOnlyInput", value=maxP, type="text", readOnly=True)
     ])]
+
+#################################
+# CREATE GRAPH ON TABLE CHANGE
+#################################
+@app.callback(Output('optionPayoffGraphWrapper', 'children'),
+              [Input('optionPayoffTableWrapper', 'children')]
+)
+def createPayoffGraph(children):
+    df = pd.DataFrame.from_records(children['props']['data'])
+    data = []
+    data += [{'x': df['Underlier'], 'y': df['Net Payoff'], 'type': 'line', 'name': "Net Payoff"}]
+    data += [{'x': df['Underlier'], 'y': df.iloc[:, 1], 'type': 'bar', 'name': df.iloc[:, 1].name}]
+    data += [{'x': df['Underlier'], 'y': df.iloc[:, 2], 'type': 'bar', 'name': df.iloc[:, 2].name}]
+    return [dcc.Graph(
+            id='payoffGraph',
+            figure= {
+                'data':data,
+                # 'layout': layout
+            }
+        ),]
 
 ##################################################################
 # RUN APPLICATION
