@@ -912,9 +912,10 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
             percMove = float(percMove) / 100
             minusStrike = (1 - percMove) * price
             plusStrike = (1 + percMove) * price
+            # Shorten the df for bull/bear spreads but need the whole df if straddle or strangle
             if type == "call":
                 df = df[['Last Price', 'Strike']]
-            else:
+            elif type == "put":
                 df = df[['Last Price.1', 'Strike']]
                 df.rename(columns={"Last Price.1": "Last Price"}, inplace=True)
             strikeList = df['Strike'].values.tolist()
@@ -1076,6 +1077,19 @@ def createPayoffGraph(children):
                 # 'layout': layout
             }
         ),]
+
+#################################
+# CHANGE OPTION TYPE OPTIONS DEPENDING ON STRATEGY
+#################################
+@app.callback(Output('optionType', 'options'),
+              [Input('optionStrat', 'value')]
+)
+def modifyOptionTypes(strategy):
+    if strategy == "straddle" or strategy == "strangle":
+        return [{'label': 'Long', 'value': 'long'}, {'label': 'Short', 'value': 'short'}]
+    else:
+        return [{'label': 'Call', 'value': 'call'}, {'label': 'Put', 'value': 'put'}]
+
 
 ##################################################################
 # RUN APPLICATION
