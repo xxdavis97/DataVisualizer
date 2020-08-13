@@ -907,7 +907,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
             df.dropna(inplace=True, how="any")
             numContracts = int(numContracts)
             price = float(companyStatScraper.getCurrMarketPrice([ticker])[0][0])
-            if strategy in ['straddle', 'strangle']:
+            if strategy == 'straddle':
                 percMove = 0
             percMove = float(percMove) / 100
             minusStrike = (1 - percMove) * price
@@ -1019,7 +1019,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                          "Net Payoff": net})
                     # lowStrikeToColor = companyStatScraper.findStrike(underlierFlux, lowStrike)
                     # highStrikeToColor = companyStatScraper.findStrike(underlierFlux, highStrike)
-            else:
+            elif strategy == "straddle":
                 strike = companyStatScraper.findStrike(strikeList, minusStrike)
                 callPrem = float(df[df["Strike"] == strike]['Last Price'].values[0])
                 putPrem = float(df[df["Strike"] == strike]['Last Price.1'].values[0])
@@ -1035,7 +1035,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 for i in range(int(bottomBound), int(topBound) + 1):
                     underlierFlux += [i]
                 payoffDf = None
-                if strategy == 'straddle' and type == 'long':
+                if type == 'long':
                     callPrem = callPrem*(-1)
                     putPrem = putPrem*(-1)
                     longCall = []
@@ -1053,7 +1053,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                     payoffDf = pd.DataFrame(
                         {"Underlier": underlierFlux, "Long Call Position": longCall, "Long Put Position": longPut,
                          "Net Payoff": net})
-                elif strategy == 'straddle' and type == 'short':
+                elif type == 'short':
                     shortCall = []
                     shortPut = []
                     net = []
@@ -1069,6 +1069,58 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                     payoffDf = pd.DataFrame(
                         {"Underlier": underlierFlux, "Short Call Position": shortCall, "Short Put Position": shortPut,
                          "Net Payoff": net})
+            else:
+                lowStrike = companyStatScraper.findStrike(strikeList, minusStrike)
+                callPrem = float(df[df["Strike"] == lowStrike]['Last Price'].values[0])
+                highStrike = companyStatScraper.findStrike(strikeList, plusStrike)
+                putPrem = float(df[df["Strike"] == highStrike]['Last Price.1'].values[0])
+                iter = 1
+                bottomBound = price - (iter * 20)
+                topBound = price + (iter * 20)
+                underlierFlux = []
+                # TODO: Make underlier go up by iter and not by 1
+                for i in range(int(bottomBound), int(topBound) + 1):
+                    underlierFlux += [i]
+                payoffDf = None
+                if type == "long":
+                    callPrem= callPrem*(-1)
+                    putPrem = putPrem*(-1)
+                    longCall = []
+                    longPut = []
+                    net = []
+                    for i in underlierFlux:
+                        if i <= lowStrike:
+                            longCall += [round(callPrem * 100 * numContracts, 2)]
+                        else:
+                            longCall += [round((callPrem + abs(i-lowStrike)) * 100 * numContracts, 2)]
+                        if i <= highStrike:
+                            longPut += [round((putPrem + abs(i-highStrike)) * 100 * numContracts, 2)]
+                        else:
+                            longPut += [round(putPrem * 100 * numContracts, 2)]
+                    for i in range(len(longCall)):
+                        net += [longCall[i] + longPut[i]]
+                    payoffDf = pd.DataFrame(
+                        {"Underlier": underlierFlux, "Long Call Position": longCall, "Long Put Position": longPut,
+                         "Net Payoff": net})
+                else:
+                    shortCall = []
+                    shortPut = []
+                    net = []
+                    for i in underlierFlux:
+                        if i <= lowStrike:
+                            shortCall += [round(callPrem * 100 * numContracts, 2)]
+                        else:
+                            shortCall += [round((callPrem - abs(i-lowStrike)) * 100 * numContracts, 2)]
+                        if i <= highStrike:
+                            shortPut += [round((putPrem - abs(i-highStrike)) * 100 * numContracts, 2)]
+                        else:
+                            shortPut += [round(putPrem * 100 * numContracts, 2)]
+                    for i in range(len(shortCall)):
+                        net += [shortCall[i] + shortPut[i]]
+                    payoffDf = pd.DataFrame(
+                        {"Underlier": underlierFlux, "Short Call Position": shortCall, "Short Put Position": shortPut,
+                         "Net Payoff": net})
+
             return dash_table.DataTable(
                 id='payoffTable',
                 columns=[{"name": i, "id": i} for i in payoffDf.columns],
