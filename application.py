@@ -1115,7 +1115,10 @@ def showMaxGainLoss(children):
         minP = "Infinity"
     else:
         minP = min(net)
-    maxP = max(net)
+    if "Long Call Position" in df.columns and "Long Put Position" in df.columns:
+        maxP = "Infinity"
+    else:
+        maxP = max(net)
     return [html.Div(className="six columns readOnlyDivWrap", children=[
         html.Label(className="optionStratLabel", htmlFor="maxLoss", children="Maximum Loss: "),
         dcc.Input(id="maxLoss", className="readOnlyInput", value=minP, type="text", readOnly=True)

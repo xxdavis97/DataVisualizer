@@ -23,6 +23,8 @@ SENTIMENT_CONTENT = html.Div(children= [
                     "the overall sentiment of the tweet is positive or negative.  The sentiment quotient (y-axis) gets a 1 added as positive tweets filter in and a 1 subtracted as negative tweets filter in.  Thus,"
                     " if the graph is currently hovering over a largely negative or largely positive number, that means the twitter feed is overall pessimistic or optimistic respectively.  The x-axis "
                     "is relatively insignifcant, just showing the tweet number of the latest 300 tweets collected."),
+                html.Strong(
+                    "*Note* This uses Twitter's API to get a live tweet feed, sometimes the API throttles and the graph won't update, if that's the case come back later")
             ]),
         ]),
         html.Div(className="row aboutRow", children=[
