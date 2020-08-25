@@ -203,27 +203,13 @@ def getCurrMarketPrice(tickers):
     if tickers != []:
         for ticker in tickers:
             url = "https://finance.yahoo.com/quote/{0}?p={0}".format(ticker)
-            site = re.get(url)
-            soup = BeautifulSoup(site.content)
-            # Stock
-            try:
-                price = soup.find_all("span")[27].text
-                rows = soup.find_all('table')[1].find_all('tr')
-                tableSpans = rows[1].find_all('span')
-                metric = tableSpans[0]
-                # ETF
-                if metric.text == "NAV":
-                    beta = rows[5].find_all('span')[1].text
-                else:
-                    beta = tableSpans[1].text
-                prices += [float(price)]
-                betas += [float(beta)]
-            # ETF
-            except:
-                price = soup.find_all("span")[11].text
-                beta = soup.find_all('table')[1].find_all('tr')[5].find_all('span')[1].text
-                prices += [float(price)]
-                betas += [float(beta)]
+            dfs = pd.read_html(url)
+            dfOne = dfs[0]
+            dfTwo = dfs[1]
+            dfOne.set_index(0, inplace=True)
+            dfTwo.set_index(0, inplace=True)
+            prices += [float(dfOne.loc['Previous Close'].values.tolist()[0])]
+            betas += [float(dfTwo.loc['Beta (5Y Monthly)'].values.tolist()[0])]
     return prices, betas
 
 def calcStockReturn(oldPrices, newPrices):
