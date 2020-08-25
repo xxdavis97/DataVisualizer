@@ -31,11 +31,10 @@ from logger import logError
 app = dash.Dash(__name__)
 application = app.server
 
-
 #################################
 # CREATES APP LAYOUT - DATA GETS FILLED IN LATER
 #################################
-app.layout = html.Div(children= [
+app.layout = html.Div(children=[
     dcc.Location(id='url', refresh=False),
     html.Div(className="banner", children=[
         html.Img(id='bannerImg'),
@@ -44,7 +43,8 @@ app.layout = html.Div(children= [
         html.Ul(children=[
             dcc.Link(html.Li("Equity Visualization"), href="/", className="borderLi", refresh=True),
             dcc.Link(html.Li("Portfolio Manager"), href="/pm", className="borderLi", refresh=True),
-            dcc.Link(html.Li("Option Strategy Payoffs"), href="/optionStrategyPayoff", className="borderLi", refresh=True),
+            dcc.Link(html.Li("Option Strategy Payoffs"), href="/optionStrategyPayoff", className="borderLi",
+                     refresh=True),
             dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
@@ -52,13 +52,14 @@ app.layout = html.Div(children= [
     html.Div(id="content")
 ])
 
-
 #################################
 # SERVE CSS STYLESHEET
 #################################
 css_directory = os.getcwd() + '/assets/'
 stylesheets = ['main.css']
 static_css_route = '/assets/'
+
+
 @app.server.route('{}<stylesheet>'.format(static_css_route))
 def serve_stylesheet(stylesheet):
     if stylesheet not in stylesheets:
@@ -68,20 +69,26 @@ def serve_stylesheet(stylesheet):
             )
         )
     return send_from_directory(css_directory, stylesheet)
+
+
 for stylesheet in stylesheets:
     app.css.append_css({"external_url": "/assets/{}".format(stylesheet)})
-
 
 #################################
 # SERVE IMAGES
 #################################
-list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png', 'bannerSentiment.png', "bannerOptions.png"]#, "catVDog.png"]
+list_of_images = ['bannerEquity.png', 'banner404.png', 'bannerAbout.png', 'me.png', 'bannerPm.png',
+                  'bannerSentiment.png', "bannerOptions.png"]  # , "catVDog.png"]
+
+
 @app.server.route('{}<image_path>.png'.format(static_css_route))
 def serve_image(image_path):
     image_name = '{}.png'.format(image_path)
     if image_name not in list_of_images:
         raise Exception('"{}" is excluded from the allowed static files'.format(image_path))
     return send_from_directory(css_directory, image_name)
+
+
 # app.index_string is how to modify the initial html
 
 
@@ -150,10 +157,12 @@ usePickle = False
 # GENERATE STOCK GRAPH
 #################################
 @app.callback(
-    Output(component_id="output-graph",component_property="children"),
-    [Input(component_id="Symbolinput",component_property="value"),Input(component_id="StartInput",component_property="value")
-     , Input(component_id="EndInput",component_property="value"), Input(component_id="bollinger",component_property="value")
-     , Input(component_id="candleToggle", component_property="value")]
+    Output(component_id="output-graph", component_property="children"),
+    [Input(component_id="Symbolinput", component_property="value"),
+     Input(component_id="StartInput", component_property="value")
+        , Input(component_id="EndInput", component_property="value"),
+     Input(component_id="bollinger", component_property="value")
+        , Input(component_id="candleToggle", component_property="value")]
 )
 def update_value(input_data, start, end, bollinger, candle):
     global toPickle
@@ -176,9 +185,10 @@ def update_value(input_data, start, end, bollinger, candle):
             # start = int(time.mktime((datetime.strptime(start,"%Y-%m-%d") - BDay(200)).timetuple()))
             start = int(time.mktime((datetime.strptime(start, "%Y-%m-%d") - timedelta(days=300)).timetuple()))
             if end == "":
-                end = int(time.mktime(datetime.strptime(datetime.strftime(datetime.today(),"%Y-%m-%d"),"%Y-%m-%d").timetuple()))
+                end = int(time.mktime(
+                    datetime.strptime(datetime.strftime(datetime.today(), "%Y-%m-%d"), "%Y-%m-%d").timetuple()))
             else:
-                end = int(time.mktime(datetime.strptime(end,"%Y-%m-%d").timetuple()))
+                end = int(time.mktime(datetime.strptime(end, "%Y-%m-%d").timetuple()))
             # download_quotes(input_data,start,end)
             df = YahooFinanceHistory(input_data, start, end).download_quotes()
         # df = pd.read_csv(input_data + ".csv")
@@ -186,8 +196,8 @@ def update_value(input_data, start, end, bollinger, candle):
             graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = df.copy()
-        # graphicalData.reset_index(inplace=True, drop=True)
-        # os.remove(input_data + ".csv")
+            # graphicalData.reset_index(inplace=True, drop=True)
+            # os.remove(input_data + ".csv")
     if toPickle:
         import pickle
         if not os.path.exists("backupData/{0}".format(input_data)):
@@ -203,12 +213,12 @@ def update_value(input_data, start, end, bollinger, candle):
     df.dropna(inplace=True)
     df.astype(float)
     graphicalData = df[df.index >= origStart]
-    #Make first bar green
+    # Make first bar green
     color = ['rgb(0,255,0)']
     closeList = df.Close.values.tolist()
     for i in range(len(closeList)):
         if i > 0:
-            if closeList[i] < closeList[i-1]:
+            if closeList[i] < closeList[i - 1]:
                 color += ['rgb(255,0,0)']
             else:
                 color += ['rgb(0,255,0)']
@@ -220,13 +230,14 @@ def update_value(input_data, start, end, bollinger, candle):
     }
     data = []
     volData = []
-    volData += [{'x': graphicalData.index, 'y': graphicalData.Volume,'type':'bar','marker':dict(color=color), 'name': "Volume"}]
+    volData += [{'x': graphicalData.index, 'y': graphicalData.Volume, 'type': 'bar', 'marker': dict(color=color),
+                 'name': "Volume"}]
     if candle:
         trace = go.Candlestick(x=graphicalData.index,
                                open=graphicalData.Open,
                                high=graphicalData.High,
                                low=graphicalData.Low,
-                               close=graphicalData.Close,name=input_data)
+                               close=graphicalData.Close, name=input_data)
         layout = go.Layout(
             title=input_data,
             xaxis=dict(
@@ -244,71 +255,92 @@ def update_value(input_data, start, end, bollinger, candle):
         # std = meanCalc.rolling(window=20).std()
         avg = df.rolling(window=20).mean()
         std = df.rolling(window=20).std()
-        df['Upper'] = avg['Close'] + (std['Close']*2)
+        df['Upper'] = avg['Close'] + (std['Close'] * 2)
         df['Middle'] = avg['Close']
-        df['Lower'] = avg['Close'] - (std['Close']*2)
+        df['Lower'] = avg['Close'] - (std['Close'] * 2)
         high = []
-        middle= []
+        middle = []
         low = []
         for i in range(len(closeList)):
             high += ['rgb(0,255,0)']
-            middle+=['rgb(0,0,255)']
+            middle += ['rgb(0,0,255)']
             low += ['rgb(255,0,0)']
         if origStart is not None and origStart != "":
             graphicalData = df[pd.to_datetime(df.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = df.copy()
-        data += [{'x' : graphicalData.index, 'y': graphicalData.Upper,'type':'line','marker':dict(color=high),'name':'Upper Bollinger Band'},
-                    {'x' : graphicalData.index, 'y': graphicalData.Middle,'type':'line','marker':dict(color=middle),'name':'Middle Bollinger Band'},
-                    {'x' : graphicalData.index, 'y': graphicalData.Lower,'type':'line','marker':dict(color=low),'name':'Lower Bollinger Band'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData.Upper, 'type': 'line', 'marker': dict(color=high),
+                  'name': 'Upper Bollinger Band'},
+                 {'x': graphicalData.index, 'y': graphicalData.Middle, 'type': 'line', 'marker': dict(color=middle),
+                  'name': 'Middle Bollinger Band'},
+                 {'x': graphicalData.index, 'y': graphicalData.Lower, 'type': 'line', 'marker': dict(color=low),
+                  'name': 'Lower Bollinger Band'}]
     if "200SMA" in bollinger:
         roll = df.rolling(window=200).mean()
         if origStart is not None and origStart != "":
-            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+            graphicalData = roll[
+                pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = roll
-        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '200 Day MA'}]
-        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '200 Day MA'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'], 'type': 'line', 'name': '200 Day MA'}]
+        volData += [
+            {'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line', 'marker': dict(color=volColor),
+             'name': '200 Day MA'}]
     if "150SMA" in bollinger:
         roll = df.rolling(window=150).mean()
         if origStart is not None and origStart != "":
-            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+            graphicalData = roll[
+                pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = roll
-        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '150 Day MA'}]
-        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '150 Day MA'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'], 'type': 'line', 'name': '150 Day MA'}]
+        volData += [
+            {'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line', 'marker': dict(color=volColor),
+             'name': '150 Day MA'}]
     if "100SMA" in bollinger:
         roll = df.rolling(window=100).mean()
         if origStart is not None and origStart != "":
-            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+            graphicalData = roll[
+                pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = roll
-        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '100 Day MA'}]
-        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '100 Day MA'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'], 'type': 'line', 'name': '100 Day MA'}]
+        volData += [
+            {'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line', 'marker': dict(color=volColor),
+             'name': '100 Day MA'}]
     if "50SMA" in bollinger:
         roll = df.rolling(window=50).mean()
         if origStart is not None and origStart != "":
-            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+            graphicalData = roll[
+                pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = roll
-        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '50 Day MA'}]
-        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '50 Day MA'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'], 'type': 'line', 'name': '50 Day MA'}]
+        volData += [
+            {'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line', 'marker': dict(color=volColor),
+             'name': '50 Day MA'}]
     if "50EWMA" in bollinger:
         roll = df.ewm(span=50, min_periods=50).mean()
         if origStart is not None and origStart != "":
-            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+            graphicalData = roll[
+                pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = roll
-        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '50 Day EWMA'}]
-        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '50 Day EWMA'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'], 'type': 'line', 'name': '50 Day EWMA'}]
+        volData += [
+            {'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line', 'marker': dict(color=volColor),
+             'name': '50 Day EWMA'}]
     if "20EWMA" in bollinger:
         roll = df.ewm(span=20, min_periods=20).mean()
         if origStart is not None and origStart != "":
-            graphicalData = roll[pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
+            graphicalData = roll[
+                pd.to_datetime(roll.index, format="%Y-%m-%d") >= datetime.strptime(origStart, "%Y-%m-%d")]
         else:
             graphicalData = roll
-        data += [{'x': graphicalData.index, 'y': graphicalData['Close'],'type':'line', 'name': '20 Day EWMA'}]
-        volData += [{'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line','marker':dict(color=volColor), 'name': '20 Day EWMA'}]
+        data += [{'x': graphicalData.index, 'y': graphicalData['Close'], 'type': 'line', 'name': '20 Day EWMA'}]
+        volData += [
+            {'x': graphicalData.index, 'y': graphicalData['Volume'], 'type': 'line', 'marker': dict(color=volColor),
+             'name': '20 Day EWMA'}]
     if '14SRSI' in bollinger:
         # https://stackoverflow.com/questions/20526414/relative-strength-index-in-python-pandas#29400434
         close = df['Close']
@@ -345,20 +377,20 @@ def update_value(input_data, start, end, bollinger, candle):
         data += [{'x': graphicalData.index, 'y': graphicalData['14ERSI'], 'type': 'line', 'name': '14 Day RSI (EWMA)'}]
     header = html.H2(input_data, className="graphHead title")
     return [header, dcc.Graph(
-            id='example_graph',
-            figure= {
-                'data':data,
-                # 'layout': layout
-            }
-        ),
-        dcc.Graph(
-            id='volume',
-            style={"height":"300px"},
-            figure= {
-                'data' : volData
-            }
-        )
-        ]
+        id='example_graph',
+        figure={
+            'data': data,
+            # 'layout': layout
+        }
+    ),
+            dcc.Graph(
+                id='volume',
+                style={"height": "300px"},
+                figure={
+                    'data': volData
+                }
+            )
+            ]
 
 
 #################################
@@ -380,13 +412,13 @@ def shareOwnershipChart(ticker):
         data = [trace]
         header = html.H2("Institutional Ownership", className="graphHead")
         return [header, dcc.Graph(
-                id='ownership',
-                style={"height":"550px"},
-                figure= {
-                    'data':data,
-                    # 'layout': layout
-                }
-            )]
+            id='ownership',
+            style={"height": "550px"},
+            figure={
+                'data': data,
+                # 'layout': layout
+            }
+        )]
     except Exception as e:
         logError(e, "shareOwnershipChart")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
@@ -408,7 +440,7 @@ def shortShareTable(ticker):
         table = dash_table.DataTable(
             id='shortTableInner',
             columns=[{"name": i, "id": i} for i in dataDf.columns],
-            data= dataDf.to_dict('records'),
+            data=dataDf.to_dict('records'),
             style_header={
                 'display': 'none'
             },
@@ -426,7 +458,7 @@ def shortShareTable(ticker):
             style_cell={'textAlign': 'center'},
             css=[{"selector": ".dash-spreadsheet", "rule": 'font-family: "Open Sans", verdana, arial, sans-serif'}],
         )
-        return [header,table]
+        return [header, table]
     except Exception as e:
         logError(e, "shortShareTable")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
@@ -449,16 +481,16 @@ def earningsChart(ticker):
         ]
         header = html.H2("Earnings History", className="graphHead")
         return [header, dcc.Graph(
-                id='earnings',
-                # style={"height":"650px"},
-                figure= {
-                    'data': data,
-                },
-                style={
-                    'height': 550,
-                    # 'width': 1200,
-                },
-            )]
+            id='earnings',
+            # style={"height":"650px"},
+            figure={
+                'data': data,
+            },
+            style={
+                'height': 550,
+                # 'width': 1200,
+            },
+        )]
     except Exception as e:
         logError(e, "earningsChart")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
@@ -497,7 +529,7 @@ def topInstitutional(ticker):
         table = dash_table.DataTable(
             id='instTable',
             columns=[{"name": i, "id": i} for i in getData.columns],
-            data= getData.to_dict('records'),
+            data=getData.to_dict('records'),
             style_as_list_view=True,
             style_header={
                 # 'display': 'none'
@@ -522,6 +554,7 @@ def topInstitutional(ticker):
         logError(e, "topInstitutional")
         # TODO: Some kind of div saying that ownership info only available for stocks not ETFs or overall market
         return ""
+
 
 #################################
 # GENERATE OPTIONS TABLE
@@ -627,7 +660,6 @@ def topMutual(ticker):
         return ""
 '''
 
-
 ##################################################################
 # ABOUT ME CALLBACKS
 ##################################################################
@@ -643,15 +675,18 @@ def topMutual(ticker):
 # ADD ROWS TO DATATABLE
 #################################
 testClicks = 0
+
+
 @app.callback(Output('posTable', 'data'),
               [Input("local", 'modified_timestamp'), Input('addRowButton', 'n_clicks')],
               [State('posTable', 'data'), State("local", "data")]
-)
+              )
 def addRowToPm(timestamp, n_clicks, posData, localData):
     global testClicks
     if len(posData) == 0:
         df = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
-    elif posData[0]['Ticker'] == '' and posData[0]['No. Of Shares Held'] == '' and posData[0]['$ Initially Invested Per Share'] == '' and len(posData) == 1:
+    elif posData[0]['Ticker'] == '' and posData[0]['No. Of Shares Held'] == '' and posData[0][
+        '$ Initially Invested Per Share'] == '' and len(posData) == 1:
         df = pd.read_json(localData, orient='split')
         if df.empty:
             df = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
@@ -660,7 +695,8 @@ def addRowToPm(timestamp, n_clicks, posData, localData):
     if n_clicks is not None and n_clicks > 0:
         testClicks += 1
         if testClicks == n_clicks:
-            df = df.append({"Ticker": "", "No. Of Shares Held": "", "$ Initially Invested Per Share": ""}, ignore_index=True)
+            df = df.append({"Ticker": "", "No. Of Shares Held": "", "$ Initially Invested Per Share": ""},
+                           ignore_index=True)
         else:
             testClicks -= 1
     return df.to_dict('records')
@@ -670,10 +706,12 @@ def addRowToPm(timestamp, n_clicks, posData, localData):
 # MODIFY ROW FROM STOCK TABLE ON INPUT TABLE DELETION OR ADDITION
 #################################
 correlations = pd.DataFrame()
+
+
 @app.callback(Output('srTable', 'data'),
               [Input('posTable', 'data')],
               [State('srTable', 'data')]
-)
+              )
 def modifyStockRow(inputData, stockData):
     global correlations
     inpDf = pd.DataFrame(inputData)
@@ -702,9 +740,11 @@ def modifyStockRow(inputData, stockData):
             stockValue = inpDf['No. Of Shares Held'] * markPrice
             stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
-            percOfPort = (stockValue / stockValue.sum()).values.tolist()[-1*len(tickerList):]
+            percOfPort = (stockValue / stockValue.sum()).values.tolist()[-1 * len(tickerList):]
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
-            stockInfoDf = pd.DataFrame({"Ticker": tickerList, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+            stockInfoDf = pd.DataFrame(
+                {"Ticker": tickerList, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl,
+                 "Return": ret, "Beta": betas, 'Standard Deviation': stds})
             if sDf.empty:
                 sDf = stockInfoDf
             else:
@@ -721,7 +761,9 @@ def modifyStockRow(inputData, stockData):
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
             percOfPort = (stockValue / stockValue.sum()).values.tolist()
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
-            sDf = pd.DataFrame({"Ticker": inpTickers, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl, "Return": ret, "Beta": betas, 'Standard Deviation': stds})
+            sDf = pd.DataFrame(
+                {"Ticker": inpTickers, "Current Market Price": markPrice, "% Of Portfolio": percOfPort, "PnL": pnl,
+                 "Return": ret, "Beta": betas, 'Standard Deviation': stds})
         # for ticker in sDf['Ticker'].values.tolist():
         #     os.remove(ticker + ".csv")
         return sDf.to_dict('records')
@@ -733,7 +775,7 @@ def modifyStockRow(inputData, stockData):
 @app.callback(Output('pmTable', 'data'),
               [Input('srTable', 'data')],
               [State('posTable', 'data'), State('pmTable', 'data')]
-)
+              )
 def fixPMReturn(stockData, inputData, portData):
     global correlations
     inpDf = pd.DataFrame(inputData)
@@ -745,13 +787,16 @@ def fixPMReturn(stockData, inputData, portData):
     else:
         sDf = pd.DataFrame(stockData)
         weights = sDf['% Of Portfolio'].values.tolist()
-        newRet, portBeta = companyStatScraper.calcPortReturn(inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(), sDf['Current Market Price'].astype(float).values.tolist(),
-                       weights, sDf['Beta'].astype(float).values.tolist())
+        newRet, portBeta = companyStatScraper.calcPortReturn(
+            inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(),
+            sDf['Current Market Price'].astype(float).values.tolist(),
+            weights, sDf['Beta'].astype(float).values.tolist())
         portStd = companyStatScraper.getPortStd(sDf['Standard Deviation'], correlations, weights)
         sharpe = companyStatScraper.getSharpeRatio(newRet, portStd)
         treynor = companyStatScraper.getTreynorRatio(newRet, portBeta)
         newRetDf = pd.DataFrame({'Portfolio Return': newRet, 'Portfolio PnL': round(sDf['PnL'].sum(), 2),
-                                 'Portfolio Beta': [round(portBeta[0], 2)], 'Portfolio Standard Deviation': portStd, 'Sharpe Ratio': sharpe,
+                                 'Portfolio Beta': [round(portBeta[0], 2)], 'Portfolio Standard Deviation': portStd,
+                                 'Sharpe Ratio': sharpe,
                                  'Treynor Ratio': treynor})
         return newRetDf.to_dict('records')
 
@@ -779,7 +824,7 @@ def storeSession(inputData):
 @app.callback(Output('sentiment-graph', 'figure'),
               [Input('sentiment-interval', 'n_intervals')])
 def updateSentiment(n):
-    pullData = open("twitter-out.txt","r").read()
+    pullData = open("twitter-out.txt", "r").read()
     lines = pullData.split('\n')
     # from logger import logTwitterFile
     # logTwitterFile(lines)
@@ -809,6 +854,7 @@ def updateSentiment(n):
     fig.update_xaxes(title_text="# Of Tweets")
     fig.update_yaxes(title_text="Sentiment")
     return fig
+
 
 '''
 ##################################################################
@@ -887,6 +933,7 @@ def updateDogSentiment(n):
     return fig
 '''
 
+
 ##################################################################
 # OPTION PAYOFFCALLBACKS
 ##################################################################
@@ -896,9 +943,10 @@ def updateDogSentiment(n):
 #################################
 @app.callback(Output('optionPayoffTableWrapper', 'children'),
               [Input('calcPayoffButton', 'n_clicks')],
-              [State('Symbolinput', 'value'), State("expiryDate", "value"), State("numContract", "value"), State("optionStrat", "value"),
+              [State('Symbolinput', 'value'), State("expiryDate", "value"), State("numContract", "value"),
+               State("optionStrat", "value"),
                State("optionType", "value"), State("percMove", "value")]
-)
+              )
 def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy, type, percMove):
     if n_clicks is not None and n_clicks > 0:
         try:
@@ -940,7 +988,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 if strategy == "bull" and type == "call":
                     shortCall = []
                     longCall = []
-                    lowStrikePrem = lowStrikePrem*(-1)
+                    lowStrikePrem = lowStrikePrem * (-1)
                     net = []
                     for i in underlierFlux:
                         if i <= highStrike:
@@ -961,7 +1009,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 elif strategy == "bull" and type == "put":
                     shortPut = []
                     longPut = []
-                    lowStrikePrem = lowStrikePrem*(-1)
+                    lowStrikePrem = lowStrikePrem * (-1)
                     net = []
                     for i in underlierFlux:
                         if i >= highStrike:
@@ -981,7 +1029,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 elif strategy == "bear" and type == "put":
                     shortPut = []
                     longPut = []
-                    highStrikePrem = highStrikePrem*(-1)
+                    highStrikePrem = highStrikePrem * (-1)
                     net = []
                     for i in underlierFlux:
                         if i >= highStrike:
@@ -1001,7 +1049,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 elif strategy == "bear" and type == "call":
                     shortCall = []
                     longCall = []
-                    highStrikePrem = highStrikePrem*(-1)
+                    highStrikePrem = highStrikePrem * (-1)
                     net = []
                     for i in underlierFlux:
                         if i <= lowStrike:
@@ -1036,18 +1084,18 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                     underlierFlux += [i]
                 payoffDf = None
                 if type == 'long':
-                    callPrem = callPrem*(-1)
-                    putPrem = putPrem*(-1)
+                    callPrem = callPrem * (-1)
+                    putPrem = putPrem * (-1)
                     longCall = []
                     longPut = []
                     net = []
                     for i in underlierFlux:
                         if i <= strike:
                             longCall += [round(callPrem * 100 * numContracts, 2)]
-                            longPut += [round((putPrem + abs(i-strike)) * 100 * numContracts, 2)]
+                            longPut += [round((putPrem + abs(i - strike)) * 100 * numContracts, 2)]
                         else:
                             longPut += [round(putPrem * 100 * numContracts, 2)]
-                            longCall += [round((callPrem + abs(i-strike)) * 100 * numContracts, 2)]
+                            longCall += [round((callPrem + abs(i - strike)) * 100 * numContracts, 2)]
                     for i in range(len(longCall)):
                         net += [longCall[i] + longPut[i]]
                     payoffDf = pd.DataFrame(
@@ -1060,10 +1108,10 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                     for i in underlierFlux:
                         if i <= strike:
                             shortCall += [round(callPrem * 100 * numContracts, 2)]
-                            shortPut += [round((putPrem - abs(i-strike)) * 100 * numContracts, 2)]
+                            shortPut += [round((putPrem - abs(i - strike)) * 100 * numContracts, 2)]
                         else:
                             shortPut += [round(putPrem * 100 * numContracts, 2)]
-                            shortCall += [round((callPrem - abs(i-strike)) * 100 * numContracts, 2)]
+                            shortCall += [round((callPrem - abs(i - strike)) * 100 * numContracts, 2)]
                     for i in range(len(shortCall)):
                         net += [shortCall[i] + shortPut[i]]
                     payoffDf = pd.DataFrame(
@@ -1083,8 +1131,8 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                     underlierFlux += [i]
                 payoffDf = None
                 if type == "long":
-                    callPrem= callPrem*(-1)
-                    putPrem = putPrem*(-1)
+                    callPrem = callPrem * (-1)
+                    putPrem = putPrem * (-1)
                     longCall = []
                     longPut = []
                     net = []
@@ -1092,9 +1140,9 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                         if i <= lowStrike:
                             longCall += [round(callPrem * 100 * numContracts, 2)]
                         else:
-                            longCall += [round((callPrem + abs(i-lowStrike)) * 100 * numContracts, 2)]
+                            longCall += [round((callPrem + abs(i - lowStrike)) * 100 * numContracts, 2)]
                         if i <= highStrike:
-                            longPut += [round((putPrem + abs(i-highStrike)) * 100 * numContracts, 2)]
+                            longPut += [round((putPrem + abs(i - highStrike)) * 100 * numContracts, 2)]
                         else:
                             longPut += [round(putPrem * 100 * numContracts, 2)]
                     for i in range(len(longCall)):
@@ -1110,9 +1158,9 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                         if i <= lowStrike:
                             shortCall += [round(callPrem * 100 * numContracts, 2)]
                         else:
-                            shortCall += [round((callPrem - abs(i-lowStrike)) * 100 * numContracts, 2)]
+                            shortCall += [round((callPrem - abs(i - lowStrike)) * 100 * numContracts, 2)]
                         if i <= highStrike:
-                            shortPut += [round((putPrem - abs(i-highStrike)) * 100 * numContracts, 2)]
+                            shortPut += [round((putPrem - abs(i - highStrike)) * 100 * numContracts, 2)]
                         else:
                             shortPut += [round(putPrem * 100 * numContracts, 2)]
                     for i in range(len(shortCall)):
@@ -1151,41 +1199,44 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
             # TODO: In table highlight the rows with the strike prices in a color
         except Exception as e:
             logError(e, "Option Payoff Table")
-            return html.P("The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
-                   "underlier expiring on the date you selected", className="optionPayoffError")
+            return html.P(
+                "The data inputted is invalid, this is likely because the ticker doesn't exist or because there are no options for this "
+                "underlier expiring on the date you selected", className="optionPayoffError")
+
 
 #################################
 # CREATE MAX AND LOSS AND GAIN ON TABLE CHANGE
 #################################
 @app.callback(Output('maxGainLossRow', 'children'),
               [Input('optionPayoffTableWrapper', 'children')]
-)
+              )
 def showMaxGainLoss(children):
     df = pd.DataFrame.from_records(children['props']['data'])
     net = df['Net Payoff'].values.tolist()
     if "Short Call Position" in df.columns and "Short Put Position" in df.columns:
-        minP = "Infinity"
+        minP = "Infinite"
     else:
         minP = min(net)
     if "Long Call Position" in df.columns and "Long Put Position" in df.columns:
-        maxP = "Infinity"
+        maxP = "Infinite"
     else:
         maxP = max(net)
     return [html.Div(className="six columns readOnlyDivWrap", children=[
         html.Label(className="optionStratLabel", htmlFor="maxLoss", children="Maximum Loss: "),
         dcc.Input(id="maxLoss", className="readOnlyInput", value=minP, type="text", readOnly=True)
     ]),
-    html.Div(className="six columns readOnlyDivWrap", children=[
-        html.Label(className="optionStratLabel", htmlFor="maxGain", children="Maximum Gain  : "),
-        dcc.Input(id="maxGain", className="readOnlyInput", value=maxP, type="text", readOnly=True)
-    ])]
+            html.Div(className="six columns readOnlyDivWrap", children=[
+                html.Label(className="optionStratLabel", htmlFor="maxGain", children="Maximum Gain  : "),
+                dcc.Input(id="maxGain", className="readOnlyInput", value=maxP, type="text", readOnly=True)
+            ])]
+
 
 #################################
 # CREATE GRAPH ON TABLE CHANGE
 #################################
 @app.callback(Output('optionPayoffGraphWrapper', 'children'),
               [Input('optionPayoffTableWrapper', 'children')]
-)
+              )
 def createPayoffGraph(children):
     df = pd.DataFrame.from_records(children['props']['data'])
     data = []
@@ -1193,24 +1244,26 @@ def createPayoffGraph(children):
     data += [{'x': df['Underlier'], 'y': df.iloc[:, 1], 'type': 'bar', 'name': df.iloc[:, 1].name}]
     data += [{'x': df['Underlier'], 'y': df.iloc[:, 2], 'type': 'bar', 'name': df.iloc[:, 2].name}]
     return [dcc.Graph(
-            id='payoffGraph',
-            figure= {
-                'data':data,
-                # 'layout': layout
-            }
-        ),]
+        id='payoffGraph',
+        figure={
+            'data': data,
+            # 'layout': layout
+        }
+    ), ]
+
 
 #################################
 # CHANGE OPTION TYPE OPTIONS DEPENDING ON STRATEGY
 #################################
 @app.callback(Output('optionType', 'options'),
               [Input('optionStrat', 'value')]
-)
+              )
 def modifyOptionTypes(strategy):
     if strategy == "straddle" or strategy == "strangle":
         return [{'label': 'Long', 'value': 'long'}, {'label': 'Short', 'value': 'short'}]
     else:
         return [{'label': 'Call', 'value': 'call'}, {'label': 'Put', 'value': 'put'}]
+
 
 #################################
 # MAKE VOLATILITY READ ONLY IF STRATEGY IS STRADDLE
@@ -1220,6 +1273,7 @@ def modifyOptionTypes(strategy):
               )
 def lockVol(strategy):
     return strategy == "straddle"
+
 
 #################################
 # MAKE VOLATILITY READ ONLY IF STRATEGY IS STRADDLE
