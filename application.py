@@ -674,15 +674,11 @@ def topMutual(ticker):
 #################################
 # ADD ROWS TO DATATABLE
 #################################
-testClicks = 0
-
-
 @app.callback(Output('posTable', 'data'),
-              [Input("local", 'modified_timestamp'), Input('addRowButton', 'n_clicks')],
+              [Input('addRowButton', 'n_clicks')],
               [State('posTable', 'data'), State("local", "data")]
               )
-def addRowToPm(timestamp, n_clicks, posData, localData):
-    global testClicks
+def addRowToPm(n_clicks, posData, localData):
     if len(posData) == 0:
         df = pd.DataFrame({"Ticker": [""], "No. Of Shares Held": [""], "$ Initially Invested Per Share": [""]})
     elif posData[0]['Ticker'] == '' and posData[0]['No. Of Shares Held'] == '' and posData[0][
@@ -693,12 +689,8 @@ def addRowToPm(timestamp, n_clicks, posData, localData):
     else:
         df = pd.DataFrame(posData)
     if n_clicks is not None and n_clicks > 0:
-        testClicks += 1
-        if testClicks == n_clicks:
-            df = df.append({"Ticker": "", "No. Of Shares Held": "", "$ Initially Invested Per Share": ""},
-                           ignore_index=True)
-        else:
-            testClicks -= 1
+        df = df.append({"Ticker": "", "No. Of Shares Held": "", "$ Initially Invested Per Share": ""},
+                       ignore_index=True)
     return df.to_dict('records')
 
 
