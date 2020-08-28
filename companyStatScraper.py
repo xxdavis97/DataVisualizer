@@ -6,6 +6,7 @@ from datareader import YahooFinanceHistory
 import requests as re
 import time
 from datetime import datetime, timedelta
+import math
 
 # soup = None
 toPickle = False
@@ -255,8 +256,9 @@ def calcStdOfReturns(tickers):
             # print(ticker)
             df = YahooFinanceHistory(ticker, start, None).download_quotes()
             # df = pd.read_csv(ticker + ".csv")
+            std += [round(df['Close'].pct_change().dropna().std()*math.sqrt(252), 4)]
+            # std += [round(df.std() / 100,2)]
             df = df['Close']
-            std += [round(df.std() / 100,2)]
             df.rename(ticker, inplace=True)
             if masterDf.empty:
                 masterDf = df.to_frame()
@@ -269,6 +271,9 @@ def getPortStd(standDev, corrs, weights):
     cols = corrs.columns
     indexes = corrs.index
     corrsCalcs = []
+    analyzedCorrs = []
+    if len(standDev) == 1:
+        return standDev[0]
     for i in range(len(cols)):
         corrsCalcs += [(weights[i]**2)*((standDev[i])**2)]
         for j in range(len(indexes)):
@@ -278,7 +283,9 @@ def getPortStd(standDev, corrs, weights):
                 wA = weights[i]
                 wB = weights[j]
                 currCorr = corrs.loc[indexes[j], cols[i]]
-                corrsCalcs += [2*wA*wB*stdA*stdB*currCorr]
+                if currCorr not in analyzedCorrs:
+                    corrsCalcs += [2*wA*wB*stdA*stdB*currCorr]
+                    analyzedCorrs += [currCorr]
     return sum(list(set(corrsCalcs)))
 
 def getSharpeRatio(ret, std):
