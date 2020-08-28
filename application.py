@@ -738,7 +738,8 @@ def modifyStockRow(inputData, stockData):
             quantityHeld = toAdd['No. Of Shares Held'].values.tolist()
             markPrice, betas = companyStatScraper.getCurrMarketPrice(tickerList)
             stockValue = inpDf['No. Of Shares Held'] * markPrice
-            stds, correlations = companyStatScraper.calcStdOfReturns(tickerList)
+            stds, _ = companyStatScraper.calcStdOfReturns(tickerList)
+            _, correlations = companyStatScraper.calcStdOfReturns(inpTickers)
             pnl = companyStatScraper.calcPnL(oldPrice.astype(float).values.tolist(), markPrice, quantityHeld)
             percOfPort = (stockValue / stockValue.sum()).values.tolist()[-1 * len(tickerList):]
             ret = companyStatScraper.calcStockReturn(oldPrice.values.tolist(), markPrice)
@@ -1291,6 +1292,8 @@ def lockVolColor(strategy):
 ##################################################################
 # RUN APPLICATION
 ##################################################################
+# TODO: IN PM PAGE A SINGLE STOCK PORTFOLIO IS DIFFERENT THAN THE SINGLE STOCK, SO PORTFOLIO CALCULATIONS ARE WRONG
+# TODO: ETF PAGE THATS BASICALLY A TABLE OF ETFANALYSIS.PY BUT EACH NAME IS A LINK THAT WILL SEND YOU BACK TO HOMEPAGE WITH THAT ETF IN THE SEARCH BAR (MAYBE MAKE TICKER PART OF LINK)
 if __name__ == '__main__':
     # For deployment
     # TODO: When do deployment, swtich options payoff part in companyStatScraper
