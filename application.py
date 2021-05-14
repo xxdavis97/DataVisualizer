@@ -1,7 +1,6 @@
 #################################
 # IMPORTS
 #################################
-from datetime import datetime, timedelta
 import dash
 import dash_table
 import dash_core_components as dcc
@@ -17,12 +16,9 @@ import companyStatScraper
 from EquityVisualizerContent import EQUITY_VISUALIZER_CONTENT
 from AboutContent import ABOUT_CONTENT
 from PmContent import PM_CONTENT
-from sentimentContent import SENTIMENT_CONTENT
 from OptionPayoffContent import OPTION_PAYOFF_CONTENT
-# from CatVDogContent import CAT_V_DOG_CONTENT
 import time
 import plotly.graph_objects as go
-import twitterSentiment
 from logger import logError
 
 #################################
@@ -45,7 +41,7 @@ app.layout = html.Div(children=[
             dcc.Link(html.Li("Portfolio Manager"), href="/pm", className="borderLi", refresh=True),
             dcc.Link(html.Li("Option Strategy Payoffs"), href="/optionStrategyPayoff", className="borderLi",
                      refresh=True),
-            dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
+            # dcc.Link(html.Li("Twitter Sentiment Analysis"), href="/sentiment", className="borderLi", refresh=True),
             dcc.Link(html.Li("About The Developer"), href="/about", refresh=True),
         ])
     ]),
@@ -779,12 +775,14 @@ def fixPMReturn(stockData, inputData, portData):
         return portData
     else:
         sDf = pd.DataFrame(stockData)
+        print(sDf)
         weights = sDf['% Of Portfolio'].values.tolist()
         newRet, portBeta = companyStatScraper.calcPortReturn(
             inpDf['$ Initially Invested Per Share'].astype(float).values.tolist(),
             sDf['Current Market Price'].astype(float).values.tolist(),
             weights, sDf['Beta'].astype(float).values.tolist())
         portStd = companyStatScraper.getPortStd(sDf['Standard Deviation'], correlations, weights)
+        print(portStd)
         sharpe = companyStatScraper.getSharpeRatio(newRet, portStd)
         treynor = companyStatScraper.getTreynorRatio(newRet, portBeta)
         newRetDf = pd.DataFrame({'Portfolio Return': newRet, 'Portfolio PnL': round(sDf['PnL'].sum(), 2),
@@ -805,7 +803,7 @@ def storeSession(inputData):
     df = pd.DataFrame(inputData)
     return df.to_json(orient="split")
 
-
+'''
 ##################################################################
 # TWITTER SENTIMENT CALLBACKS
 ##################################################################
@@ -817,7 +815,7 @@ def storeSession(inputData):
 @app.callback(Output('sentiment-graph', 'figure'),
               [Input('sentiment-interval', 'n_intervals')])
 def updateSentiment(n):
-    pullData = open("twitter-out.txt", "r").read()
+    pullData = open("deprecated/twitter-out.txt", "r").read()
     lines = pullData.split('\n')
     # from logger import logTwitterFile
     # logTwitterFile(lines)
@@ -849,7 +847,7 @@ def updateSentiment(n):
     return fig
 
 
-'''
+
 ##################################################################
 # CAT V DOG SENTIMENT CALLBACKS
 ##################################################################

@@ -5,7 +5,7 @@ from companyStatScraper import getRiskFreeRate
 import time
 import math
 
-INVESTABLE_ETFS = pd.read_csv("investable_tickers.csv", header=None).values.tolist()
+INVESTABLE_ETFS = pd.read_csv("../investable_tickers.csv", header=None).values.tolist()
 for i in range(len(INVESTABLE_ETFS)):
     INVESTABLE_ETFS[i] = INVESTABLE_ETFS[i][0]
 

@@ -22,7 +22,7 @@ OPTION_PAYOFF_CONTENT = html.Div(children= [
                 html.Label(className="optionStratLabel", htmlFor="Symbolinput", children="Ticker: "),
                 dcc.Input(id="Symbolinput", value="", type="text"),
                 html.Label(className="optionStratLabel", htmlFor="expiryDate", children="Expiry: "),
-                dcc.Input(id="expiryDate", value="", type="date"),
+                dcc.Input(id="expiryDate", value="", type="date", placeholder="yyyy-mm-dd"),
                 html.Label(className="numContractLabel", htmlFor="numContract", children="Number Of Contracts: "),
                 dcc.Input(id="numContract", value="", type="text"),
                 dcc.Dropdown(

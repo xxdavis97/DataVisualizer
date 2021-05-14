@@ -5,8 +5,8 @@ def logDf(df, name=""):
     cols = df.columns
     index = df.index
     values = df.values
-    if not os.path.exists("dfLog.txt"):
-        with open("dfLog.txt", "w+") as f:
+    if not os.path.exists("deprecated/dfLog.txt"):
+        with open("deprecated/dfLog.txt", "w+") as f:
             f.write(name + "\n")
             f.write("  ")
             for col in cols:
@@ -19,7 +19,7 @@ def logDf(df, name=""):
                 f.write("\n")
             f.close()
     else:
-        with open("dfLog.txt", "a") as f:
+        with open("deprecated/dfLog.txt", "a") as f:
             f.write("\n\n\n")
             f.write(name + "\n")
             f.write(" ")
@@ -72,22 +72,22 @@ def logTwitterFile(lines):
             f.close()
 
 def logTweets(tweet):
-    if not os.path.exists("tweetLog.txt"):
-        with open("tweetLog.txt", "wb+") as f:
+    if not os.path.exists("deprecated/tweetLog.txt"):
+        with open("deprecated/tweetLog.txt", "wb+") as f:
             f.write(bytes(tweet, "utf16") + bytes("\n", "utf16"))
             f.close()
     else:
-        with open("tweetLog.txt", "ab") as f:
+        with open("deprecated/tweetLog.txt", "ab") as f:
             f.write(bytes(tweet, "utf16") + bytes("\n", "utf16"))
             f.close()
 
 def logTwitterError(status):
-    if not os.path.exists("twitterError.txt"):
-        with open("twitterError.txt", "w+") as f:
+    if not os.path.exists("deprecated/twitterError.txt"):
+        with open("deprecated/twitterError.txt", "w+") as f:
             f.write(str(status) + "\n")
             f.close()
     else:
-        with open("twitterError.txt", "a") as f:
+        with open("deprecated/twitterError.txt", "a") as f:
             f.write(str(status) + "\n")
             f.close()
 
