@@ -71,7 +71,7 @@ class YahooFinanceHistory:
         self.end = endDate
 
     def get_crumb(self):
-        response = self.session.get(self.crumb_link.format(self.symbol), timeout=self.timeout)
+        response = self.session.get(self.crumb_link.format(self.symbol), timeout=self.timeout, headers={ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36' })
         response.raise_for_status()
         match = re.search(self.crumble_regex, response.text)
         if not match:

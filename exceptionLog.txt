@@ -1,2 +1,310 @@
 Option Payoff Table:
     Pandas requires version '4.6.0' or newer of 'bs4' (version '4.5.3' currently installed).
+
+
+shortShareTable:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+optionsData:
+    list index out of range
+
+
+optionsData:
+    HTTP Error 404: Not Found
+
+
+optionsData:
+    HTTP Error 404: Not Found
+
+
+optionsData:
+    HTTP Error 404: Not Found
+
+
+Option Payoff Table:
+    read_html() got an unexpected keyword argument 'headers'
+
+
+Option Payoff Table:
+    read_html() got an unexpected keyword argument 'headers'
+
+
+Option Payoff Table:
+    read_html() got an unexpected keyword argument 'headers'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    read_html() got an unexpected keyword argument 'headers'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    read_html() got an unexpected keyword argument 'headers'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'
+
+
+Option Payoff Table:
+    time data '' does not match format '%Y-%m-%d'

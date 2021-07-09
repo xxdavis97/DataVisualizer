@@ -51,7 +51,7 @@ OPTION_PAYOFF_CONTENT = html.Div(children= [
                 ),
                 html.Label(className="optionStratLabel", htmlFor="percMove", children="Expected Move (%): "),
                 dcc.Input(id="percMove", value="", type="text"),
-                html.Button("Calculate", id="calcPayoffButton", className="btn-submit")
+                html.Button("Calculate", id="calcPayoffButton", className="btn-submit", n_clicks=0)
             ]),
         ]),
         html.Div(id ="maxGainLossRow", className="row aboutRow"),

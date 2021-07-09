@@ -11,9 +11,11 @@ import math
 # soup = None
 toPickle = False
 usePickle = False
+headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36' }
 def getInstiutionalOwnership(ticker):
     global toPickle
     global usePickle
+    global headers
     # global soup
     # if soup is None:
     if usePickle:
@@ -23,7 +25,7 @@ def getInstiutionalOwnership(ticker):
             return pick
     else:
         url = "https://finance.yahoo.com/quote/{0}/key-statistics?p={0}".format(ticker)
-        site = re.get(url)
+        site = re.get(url, headers=headers)
         soup = BeautifulSoup(site.content)
         tables = soup.find_all('table')
         # 5 is profit margin table
@@ -46,6 +48,7 @@ def getInstiutionalOwnership(ticker):
 def getShortShares(ticker):
     global toPickle
     global usePickle
+    global headers
     # global soup
     # if soup is None:
     if usePickle:
@@ -55,7 +58,7 @@ def getShortShares(ticker):
             return pick
     else:
         url = "https://finance.yahoo.com/quote/{0}/key-statistics?p={0}".format(ticker)
-        site = re.get(url)
+        site = re.get(url, headers=headers)
         soup = BeautifulSoup(site.content)
         tables = soup.find_all('table')
         # Used to be 2?
@@ -77,6 +80,7 @@ def getShortShares(ticker):
 def getEarningsHist(ticker):
     global toPickle
     global usePickle
+    global headers
     if usePickle:
         with open("./backupData/{0}/{0}-Earnings-Hist".format(ticker), 'rb') as f:
             pick = pickle.load(f)
@@ -84,7 +88,7 @@ def getEarningsHist(ticker):
             return pick
     else:
         url = "https://finance.yahoo.com/quote/{0}/analysis?p={0}".format(ticker)
-        site = re.get(url)
+        site = re.get(url, headers=headers)
         soup = BeautifulSoup(site.content)
         tables = soup.find_all('table')
         rows = tables[2].find_all("tr")
@@ -105,6 +109,7 @@ def getEarningsHist(ticker):
 def getCompanyBio(ticker):
     global toPickle
     global usePickle
+    global headers
     if usePickle:
         with open("./backupData/{0}/{0}-Company-Bio".format(ticker), 'rb') as f:
             pick = pickle.load(f)
@@ -112,7 +117,7 @@ def getCompanyBio(ticker):
             return pick
     else:
         url = "https://finance.yahoo.com/quote/{0}/profile?p={0}".format(ticker)
-        site = re.get(url)
+        site = re.get(url, headers=headers)
         soup = BeautifulSoup(site.content)
         if toPickle:
             if not os.path.exists("backupData/{0}".format(ticker)):
@@ -125,6 +130,7 @@ def getCompanyBio(ticker):
 def getFundOwnership(ticker):
     global toPickle
     global usePickle
+    global headers
     if usePickle:
         with open("./backupData/{0}/{0}-Fund-Ownership".format(ticker), 'rb') as f:
             pick = pickle.load(f)
@@ -132,7 +138,7 @@ def getFundOwnership(ticker):
             return pick
     else:
         url = "https://finance.yahoo.com/quote/{0}/holders?p={0}".format(ticker)
-        site = re.get(url)
+        site = re.get(url, headers=headers)
         soup = BeautifulSoup(site.content)
         institutional = soup.find_all('table')[1]
         titles = [name.text for name in institutional.find('tr').find_all('th')]
@@ -163,6 +169,7 @@ def getFundOwnership(ticker):
 def getOptionsData(ticker, date=None):
     global toPickle
     global usePickle
+    global headers
     if usePickle:
         with open("./backupData/{0}/{0}-Option-Data".format(ticker), 'rb') as f:
             pick = pickle.load(f)
@@ -172,7 +179,7 @@ def getOptionsData(ticker, date=None):
         expiry = None
         if date is None:
             url = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker)
-            site = re.get(url)
+            site = re.get(url, headers=headers)
             soup = BeautifulSoup(site.content)
             expiry = soup.find_all("section")[1].find("section").find("div").find_all("div")[1].text
         # TODO: Pick option expiry https://stackoverflow.com/questions/28680896/how-can-i-get-the-3rd-friday-of-a-month-in-python
@@ -182,13 +189,17 @@ def getOptionsData(ticker, date=None):
         # optionTable = soup.find("table")
         # headerRow = optionTable.find_all("th")
         if date is None:
-            optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker))[0]
+            htmlUrl = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true".format(ticker)
+            html = re.get(htmlUrl, headers=headers)
+            optionFrame = pd.read_html(html.content)[0]
         else:
             # For local
             # date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d") - timedelta(hours=4)).timetuple()))
             # For deployment
             date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d")).timetuple()))
-            optionFrame = pd.read_html("https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date))[0]
+            htmlUrl = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date)
+            html = re.get(htmlUrl, headers=headers)
+            optionFrame = pd.read_html(html.content)[0]
         optionFrame.drop(["Change", "% Change", "Change.1", "% Change.1", "Volume", "Volume.1"], inplace=True, axis=1)
         if toPickle:
             if not os.path.exists("backupData/{0}".format(ticker)):
@@ -199,12 +210,14 @@ def getOptionsData(ticker, date=None):
         return [expiry, optionFrame]
 
 def getCurrMarketPrice(tickers):
+    global headers
     prices = []
     betas = []
     if tickers != []:
         for ticker in tickers:
             url = "https://finance.yahoo.com/quote/{0}?p={0}".format(ticker)
-            dfs = pd.read_html(url)
+            html = re.get(url, headers=headers)
+            dfs = pd.read_html(html.content)
             dfOne = dfs[0]
             dfTwo = dfs[1]
             dfOne.set_index(0, inplace=True)
