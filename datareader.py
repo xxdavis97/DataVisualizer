@@ -62,7 +62,7 @@ class YahooFinanceHistory:
     timeout = 2
     crumb_link = 'https://finance.yahoo.com/quote/{0}/history?p={0}'
     crumble_regex = r'CrumbStore":{"crumb":"(.*?)"}'
-    quote_link = 'https://query1.finance.yahoo.com/v7/finance/download/{quote}?period1={dfrom}&period2={dto}&interval=1d&events=history&crumb={crumb}'
+    quote_link = 'https://query1.finance.yahoo.com/v7/finance/download/{quote}?period1={dfrom}&period2={dto}&interval=1d&events=history'#&crumb={crumb}'
 
     def __init__(self, symbol, startDate, endDate):
         self.symbol = symbol
@@ -73,6 +73,8 @@ class YahooFinanceHistory:
     def get_crumb(self):
         response = self.session.get(self.crumb_link.format(self.symbol), timeout=self.timeout, headers={ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36' })
         response.raise_for_status()
+        for c in response.cookies:
+            print(c.name, c.value)
         match = re.search(self.crumble_regex, response.text)
         if not match:
             raise ValueError('Could not get crumb from Yahoo Finance')
@@ -86,13 +88,14 @@ class YahooFinanceHistory:
             self.start = 0
         if self.end is None:
             self.end = get_now_epoch()
-        url = self.quote_link.format(quote=self.symbol, dfrom=self.start, dto=self.end, crumb=self.crumb)
-        response = self.session.get(url)
-        response.raise_for_status()
+        url = self.quote_link.format(quote=self.symbol, dfrom=self.start, dto=self.end)#, crumb=self.crumb)
+        return pd.read_csv(url)
+        # response = self.session.get(url)
+        # response.raise_for_status()
         # pd.read_csv(StringIO(response.text)).to_csv("{0}.csv".format(self.symbol))
         # filename = '%s.csv' % (self.symbol)
         # print(filename)
-        return pd.read_csv(StringIO(response.text))
+        # return pd.read_csv(StringIO(response.text))
         # with open(filename, 'wb') as handle:
         #     for block in response.iter_content(1024):
         #         handle.write(block)

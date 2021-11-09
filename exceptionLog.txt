@@ -308,3 +308,7 @@ Option Payoff Table:
 
 Option Payoff Table:
     time data '' does not match format '%Y-%m-%d'
+
+
+shortShareTable:
+    list index out of range
