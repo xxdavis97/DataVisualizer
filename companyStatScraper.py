@@ -193,10 +193,10 @@ def getOptionsData(ticker, date=None):
             html = re.get(htmlUrl, headers=headers)
             optionFrame = pd.read_html(html.content)[0]
         else:
-            # For local
-            # date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d") - timedelta(hours=4)).timetuple()))
+            # For local TODO
+            date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d") - timedelta(hours=4)).timetuple()))
             # For deployment
-            date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d")).timetuple()))
+            # date = int(time.mktime((datetime.strptime(date, "%Y-%m-%d")).timetuple()))
             htmlUrl = "https://finance.yahoo.com/quote/{0}/options?p={0}&straddle=true&date={1}".format(ticker, date)
             html = re.get(htmlUrl, headers=headers)
             optionFrame = pd.read_html(html.content)[0]

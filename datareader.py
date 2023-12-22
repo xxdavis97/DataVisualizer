@@ -77,7 +77,9 @@ class YahooFinanceHistory:
             print(c.name, c.value)
         match = re.search(self.crumble_regex, response.text)
         if not match:
-            raise ValueError('Could not get crumb from Yahoo Finance')
+            print("Could not find crumb")
+            # todo: evaluate
+            # raise ValueError('Could not get crumb from Yahoo Finance')
         else:
             self.crumb = match.group(1)
 

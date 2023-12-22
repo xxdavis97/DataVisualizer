@@ -312,3 +312,43 @@ Option Payoff Table:
 
 shortShareTable:
     list index out of range
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
