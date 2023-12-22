@@ -1287,6 +1287,8 @@ def lockVolColor(strategy):
 if __name__ == '__main__':
     # For deployment
     # TODO: When do deployment, swtich options payoff part in companyStatScraper
-    application.run(debug=True, host='0.0.0.0', port='80')
+    print(application.name)
+    application.run(debug=True, host='0.0.0.0', port='8000')
+    # application.run(debug=True, host='0.0.0.0', port='80') # dev
     # For local
-    # application.run(debug=False)
+    # application.run(debug=False) # local
