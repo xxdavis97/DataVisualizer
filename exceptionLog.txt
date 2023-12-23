@@ -352,3 +352,67 @@ Option Payoff Table:
 
 Option Payoff Table:
     No tables found
+
+
+optionsData:
+    list index out of range
+
+
+shareOwnershipChart:
+    list index out of range
+
+
+shortShareTable:
+    list index out of range
+
+
+earningsChart:
+    list index out of range
+
+
+companyBio:
+    list index out of range
+
+
+topInstitutional:
+    list index out of range
+
+
+optionsData:
+    'NoneType' object has no attribute 'find_all'
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
+
+
+Option Payoff Table:
+    No tables found
