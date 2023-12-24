@@ -50,7 +50,7 @@ PM_CONTENT = html.Div(children= [
                          {"id": "No. Of Shares Held", "name": "No. Of Shares Held", "type": "numeric"},
                          {"id": "$ Initially Invested Per Share", "name": "$ Initially Invested Per Share", "type": "numeric"}],
                 style_header={
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 },
                 style_data_conditional=[
                     {
@@ -85,7 +85,7 @@ PM_CONTENT = html.Div(children= [
                          {"id": "Beta", "name": "Beta", "type": "numeric"},
                          {"id": "Standard Deviation", "name": "Standard Deviation", "type": "numeric", 'format': FormatTemplate.percentage(2)}],
                 style_header={
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 },
                 style_data={
                     'whiteSpace': 'normal',
@@ -144,7 +144,7 @@ PM_CONTENT = html.Div(children= [
                          {"id": "Sharpe Ratio", "name": "Sharpe Ratio", "type": "numeric"},
                          {"id": "Treynor Ratio", "name": "Treynor Ratio", "type": "numeric"}],
                 style_header={
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 },
                 style_data={
                     'whiteSpace': 'normal',

@@ -423,7 +423,7 @@ there.
 
 .headerBox {
     width: 100%;
-    background-color: #3399ff;
+    background-color: #0082A0;
     padding: 0px 10px 10px 10px;
 }
 
@@ -498,7 +498,7 @@ html {
 .bio {
 	margin: 0 auto;
 	width: 65%;
-	border: 1px solid #3399ff;
+	border: 1px solid #0082A0;
 	border-radius: 5px;
 	padding: 5px 30px;
 	height: 500px;
@@ -578,7 +578,7 @@ a:hover {
 }
 
 .aboutHeader {
-  border-bottom: 5px solid #3399ff;
+  border-bottom: 5px solid #0082A0;
   margin-top: 0px;
   margin-bottom: 10px;
 }
@@ -601,7 +601,7 @@ a:hover {
 }
 
 .workRow {
-  border-bottom: 5px solid #3399ff;
+  border-bottom: 5px solid #0082A0;
 }
 
 h6 {

@@ -443,7 +443,7 @@ def shortShareTable(ticker):
             style_data_conditional=[
                 {
                     'if': {'row_index': 'even'},
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 }
             ],
             style_data={
@@ -533,7 +533,7 @@ def topInstitutional(ticker):
             style_data_conditional=[
                 {
                     'if': {'row_index': 'even'},
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 }
             ],
             style_data={
@@ -587,7 +587,7 @@ def optionsData(ticker):
             style_data_conditional=[
                 {
                     'if': {'row_index': 'even'},
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 },
                 {
                     'if': {'column_id': "Strike"},
@@ -638,7 +638,7 @@ def topMutual(ticker):
             style_data_conditional=[
                 {
                     'if': {'row_index': 'even'},
-                    'backgroundColor': '#3399ff'
+                    'backgroundColor': '#0082A0'
                 }
             ],
             style_data={
