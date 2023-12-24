@@ -10,8 +10,8 @@ ABOUT_CONTENT = html.Div(children= [
                 html.H2("About", className="aboutHeader"),
                 html.P("Jared graduated from Stevens Institute of Technology in 2020 with a Bachelor of Science for Computer Science in "
                        "addition to double minoring in Quantitative Finance as well as Pure & Applied Mathematics.  After graduation "
-                       "Jared started his career at Goldman Sachs where he is a Software Engineer for the Consumer and Investment "
-                       "Management Division.  Outside of work, Jared enjoys to work on coding side projects such as this website.  Some "
+                       "Jared started his career at Goldman Sachs where he is a Software Engineer for Goldman Sachs Asset Management as part of the External Investing Group.  "
+                       "Outside of work, Jared enjoys to work on coding side projects such as this website.  Some "
                        "of Jared's non-coding related interests include travelling, skiing, golfing and reading.  ")
             ])
         ]),
@@ -24,6 +24,8 @@ ABOUT_CONTENT = html.Div(children= [
                     html.Li(
                         "Well versed in popular Python libraries such as Numpy, Pandas, Matplotlib, Requests, Beautiful Soup, Pyodbc, "
                         "Selenium, Xlwings, Flask and Dash (the library used to create this site)"),
+                    html.Li(
+                        "Experienced in Java frameworks/libraries such as Spring, MyBatis, Hibernate, Dropwizard, Jackson"),
                     html.Li(
                         "As a side project developed a trend following stock algorithm deployed on a raspberry pi server that sends email "
                         "alerts of potential stock picks."),
