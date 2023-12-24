@@ -89,17 +89,15 @@ def getEarningsHist(ticker):
     else:
         url = "https://finance.yahoo.com/quote/{0}/analysis?p={0}".format(ticker)
         site = re.get(url, headers=headers)
-        soup = BeautifulSoup(site.content)
+        soup = BeautifulSoup(site.content, "html")
         tables = soup.find_all('table')
         rows = tables[2].find_all("tr")
         dates = rows[0].find_all("span")
         dates = [date.text for date in dates][1:]
-        epsEst = rows[1].find_all("span")
+        epsEst = rows[1].find_all("td")
         epsEst = [eps.text for eps in epsEst][1:]
-        epsAct = rows[2].find_all("span")
+        epsAct = rows[2].find_all("td")
         epsAct = [eps.text for eps in epsAct][1:]
-        print("EPS Est: " + epsEst)
-        print("EPS Act: " + epsAct)
         if toPickle:
             if not os.path.exists("backupData/{0}".format(ticker)):
                 os.mkdir("backupData/{0}".format(ticker))

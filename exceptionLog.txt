@@ -416,3 +416,59 @@ Option Payoff Table:
 
 Option Payoff Table:
     No tables found
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
+
+
+earningsChart:
+    can only concatenate str (not "list") to str
