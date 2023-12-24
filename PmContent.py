@@ -55,7 +55,7 @@ PM_CONTENT = html.Div(children= [
                 style_data_conditional=[
                     {
                         'if': {'row_index': 'odd'},
-                        'backgroundColor': '#b3d9ff'
+                        'backgroundColor': '#1AB3DC'
                     }
                 ],
                 style_data={
