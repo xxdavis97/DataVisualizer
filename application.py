@@ -591,7 +591,7 @@ def optionsData(ticker):
                 },
                 {
                     'if': {'column_id': "Strike"},
-                    'backgroundColor': '#cce6ff',
+                    'backgroundColor': '#1AB3DC',
                     'borderBottom': '0px'
                 }
             ],

@@ -98,6 +98,8 @@ def getEarningsHist(ticker):
         epsEst = [eps.text for eps in epsEst][1:]
         epsAct = rows[2].find_all("span")
         epsAct = [eps.text for eps in epsAct][1:]
+        print("EPS Est: " + epsEst)
+        print("EPS Act: " + epsAct)
         if toPickle:
             if not os.path.exists("backupData/{0}".format(ticker)):
                 os.mkdir("backupData/{0}".format(ticker))

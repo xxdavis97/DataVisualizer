@@ -553,6 +553,7 @@ ul, a {
 }
 
 .borderLi {
+  color: #0082A0;
   border-right: 1px solid black;
 }
 
