@@ -1168,7 +1168,7 @@ def calculateOptionPayoffTable(n_clicks, ticker, expiry, numContracts, strategy,
                 style_data_conditional=[
                     {
                         'if': {'row_index': 'even'},
-                        'backgroundColor': '#99ccff'
+                        'backgroundColor': '#1AB3DC'
                     },
                     # {
                     #     'if': {

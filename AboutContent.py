@@ -48,13 +48,13 @@ ABOUT_CONTENT = html.Div(children= [
             ]),
             html.Ul(children=[
                 html.Li(
-                    "From scratch created an application utilizing Angular, Java, and SQL to allow the business to gain streamlined"
+                    "Wrote an application utilizing Angular, Java, and SQL to allow the business to gain streamlined"
                     " visibility of critical missing data for our private equity investments, allowing for easy correction."),
                 html.Li(
-                    "Developed a dashboard with regular database interaction to easily see data errors that were otherwise quite"
-                    " difficult to find and led to far more accurate reporting to our clients."),
-                html.Li("Maintained regular communication with the business side, the main stakeholders, "
-                        "to ensure a clean and useful user experience."),
+                    "Worked closely with data providers and business stakeholders to develop an application to automate the screening of ETF data based on various proprietary rules.  Following the "
+                    "screen the system automatically uploads various reports to ultimately inform client investing decisions."),
+                html.Li("Created a system to automate the generation of Investment Committee as well as client materials by pulling from various third-party data sources in conjunction with internal proprietary data.  This"
+                        "enhancement saved an estimated 10 hours of work per report, of which there are thousands of reports generated per annum."),
             ])
         ]),
     ]),
@@ -133,7 +133,7 @@ ABOUT_CONTENT = html.Div(children= [
                 html.Li(
                     "Cell: (845) 667-9413"),
                 html.Li(
-                    "Email: jdavis4@stevens.edu"),
+                    "Email: xxdavis97@gmail.com"),
                 html.Li("Linkedin: https://www.linkedin.com/in/jared-d-bb0b5699/"),
             ])
         ]),
